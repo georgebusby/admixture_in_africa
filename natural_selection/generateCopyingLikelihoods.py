@@ -1,6 +1,10 @@
 #!/usr/bin/python
 
-
+############################################################
+## THIS SCRIPT TAKES CHROMOPAINTER OUTPUT AND GENERATES  ##
+## A MATRIX OF GENOTYPES THAT CAN BE USED IN THE NATURAL ##
+## SELECTION PROGRAMS
+############################################################
 import gzip # for reading/writing gzipped files
 from optparse import OptionParser # for command line options
 import numpy as np
