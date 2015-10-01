@@ -10,8 +10,9 @@ library("maptools")
 ## SOURCE SOME USEFUL FUNCTIONS FROM copyselection PACKAGE ##
 ## ~~~~~~~~~~~       !!! IN DEVELOPMENT !!!     ~~~~~~~~~~ ##
 ############################################################
-source("~/repos/popgen/packages_dev/functionWriter.R")
-setwd("~/repos/popgen/")
+main_dir <- "~/repos/" ## where the code is kept
+source(paste0(main_dir,"popgen/packages_dev/functionWriter.R"))
+setwd(paste0(main_dir,"popgen/"))
 ###########################################################
 ## DEFINE DATAFILES
 leginfo_file <- "data/MalariaGenAdmixturePopulationKey.txt"
