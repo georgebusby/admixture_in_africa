@@ -1,0 +1,8 @@
+Country latlong updown
+Gambia newlat -2
+Mali newlong 2
+Ghana newlong -2
+Cameroon newlat -2
+Tanzania newlong -2
+Kenya newlat 2
+Namibia newlong 2
