@@ -5,43 +5,10 @@
 ## LOAD MAP LIBRARIES ##
 library("rworldmap")
 library("maptools")
-
-############################################################
-## SOURCE SOME USEFUL FUNCTIONS FROM copyselection PACKAGE ##
-## ~~~~~~~~~~~       !!! IN DEVELOPMENT !!!     ~~~~~~~~~~ ##
-############################################################
-main_dir <- "~/repos/" ## where the code is kept
-source(paste0(main_dir,"popgen/packages_dev/functionWriter.R"))
-setwd(paste0(main_dir,"popgen/"))
-###########################################################
-## DEFINE DATAFILES
-leginfo_file <- "data/MalariaGenAdmixturePopulationKey.txt"
-mapinfo_file <- "data/MalariaGenAdmixturePopulationKey2.txt"
-latlong_file <- "data/MalariaGenAdmixturePopulationKeyLatLongs.txt"
-poppos_file <- "data/MalariaGenAdmixturePopulationKeyMapPositions.txt"
-popkey_file <- "data/MalariaGenAdmixturePopulationOverview.txt"
 ###########################################################
 ## LOAD DATA
 ## file outlining population provenance, colours, and symbols
 mapinfo <- read.table(mapinfo_file,header=T,comment.char="", as.is = T)
-## population latitudes and longitudes
-
-## controls how pops with same lat/long are plotted
-
-## define the region that a population belongs to 
-popkey <- read.table(popkey_file,header=T,as.is=T)
-popkey$Ethnic_Group <- toupper(popkey$Ethnic_Group)
-###########################################################
-## SET PLOTTING PARAMETERS
-transparent_cols <- FALSE ## use transparent colours for malariagen countries
-plot_equator <- FALSE ## should equator and tropics be plotted
-plot_ancestry_regions <- FALSE ## should countries be coloured by ancestry region or individually?
-map_xlim<-c(-20,50) ## X-AXIS LIMITS OF MAP
-map_ylim<-c(-32,28) ## Y-AXIS LIMITS OF MAP
-regions <- unique(popkey$RegionM) ## regions
-pcolshex <- c("#0000CD", "#03B4CC", "#A65628", "#FF7F00", "#984EA3", "#4DAF4A", "#CCCC00") ## colours
-map_ocean_col <- "paleturquoise1" ## colour of ocean in map
-map_miss_col <- "white" ## colour of non-focal countries in map
 
 ###########################################################
 ## SET UP THE MAPINFO DATAFRAME
@@ -51,7 +18,7 @@ mapinfo <- data.frame(mapinfo)
 ## set colour to factor
 mapinfo$colour <- factor(mapinfo$colour,levels=unique(mapinfo$colour))
 ## generate a vector of regions for each ethnic group
-newcols <- findPopRegion(mapinfo$EthnicGroup,popkey)
+newcols <- copyselection::getPopRegion(mapinfo$EthnicGroup,popkey)
 newcols <- factor(newcols, levels=regions)
 mapinfo <- cbind(mapinfo,newcols)
 colnames(mapinfo)[ncol(mapinfo)] <- "region"
@@ -100,6 +67,55 @@ box()
 ## PLOT POINTS, ALLOWING FOR MULTIPLE POPS FROM THE SAME COUNTRY
 newi <- plotPopPoints(latlong_file,leginfo_file,poppos_file,pt_cex=2)
 
-
-### newi can now be used to make legends ..
- 
+###########################################################
+## PLOT THREE SEPARATE LEGENDS
+if(plot_legends == TRUE)
+{
+    afr_cnts <- list(c("Gambia","Mali","BurkinaFaso","Ghana","Nigeria","Cameroon"),
+                     c("Sudan","Ethiopia","Somalia","Kenya"),
+                     c("Angola","Namibia","Botswana","SouthAfrica","Tanzania","Malawi"))
+    names(afr_cnts) <- c("WEST/CENTRAL","EASTERN","SOUTHERN")
+    malgen_cnts <- c("Gambia","Mali","BurkinaFaso","Ghana","Cameroon","Kenya","Tanzania","Malawi")
+    for(i in 1:length(afr_cnts))
+    {
+        leginfo <-read.table(leginfo_file,header=T,comment.char="")
+        legnumbers <- read.table(popnums_file,header=F)
+        legnumbers[,1] <- tidyNames(legnumbers[,1])
+        pop_nums <- c()
+        for(j in as.character(leginfo$EthnicGroup))
+        {
+            pn <- legnumbers[legnumbers$V1==j,2]
+            if(length(pn)>0)
+            {
+                pop_nums <- c(pop_nums,pn)    
+            }  else {
+                pop_nums <- c(pop_nums,"X")
+            }
+        }
+        leginfo <- cbind(leginfo,pop_nums)
+        leginfo <- leginfo[leginfo$Country%in%unlist(afr_cnts[i]),]
+        leginfo$Country <- factor(leginfo$Country,levels=unlist(afr_cnts[i]))
+        leginfo <- leginfo[order(leginfo$Country,leginfo$Colour,leginfo$EthnicGroup),]
+        if(i==3)
+        {
+            leginfo$Country <- factor(leginfo$Country,levels=c("Tanzania","Malawi","SouthAfrica","Namibia","Botswana","Angola"))
+            leginfo <- leginfo[order(leginfo$Country,decreasing=F),]
+        }
+        legrim <- rep("#000000",nrow(leginfo))
+        legrim[leginfo$rim==1]  <- as.character(leginfo$Colour)[leginfo$rim==1]
+        
+        par(mar=c(0,0,0,0))
+        plot(0,0,type="n",axes=F,xlab="",ylab="")
+        legend("topleft",ncol=1,
+               legend=c(gsub("\\_","\n",paste0(as.character(leginfo$EthnicGroup),
+                                               " [",as.character(leginfo$pop_nums),"]")),"\n"),
+               pch=as.numeric(leginfo$poppch),
+               pt.bg=as.character(leginfo$Colour),
+               pt.cex=c(rep(pt_cex,length(leginfo$poppch)),0),
+               pt.lwd=0.5,y.intersp = 0.9,
+               col=legrim,cex=0.75,
+               text.col=as.character(leginfo$Colour),xpd=T,
+               bty="n",
+               title.col="black",title.adj=0)
+    }
+}    

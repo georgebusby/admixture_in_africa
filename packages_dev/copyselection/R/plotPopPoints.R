@@ -7,7 +7,8 @@
 #' @param pt_cex the size of the symbols on the map
 #' @param pt_lwd the width of the outline to the symbols
 #' @keywords Busby_bespoke
-#' @export plots new points and returns a dataframe with plotting parameters (helpful for legends)
+#' @return plots new points and returns a dataframe with plotting parameters (helpful for legends)
+#' @export
 #' @examples
 #' plotPopPoints("data/MalariaGenAdmixturePopulationKeyLatLongs.txt",
 #'               "data/MalariaGenAdmixturePopulationKey.txt",
@@ -68,20 +69,14 @@ plotPopPoints <- function(latlong_file,leginfo_file,poppos_file,pt_cex=1,pt_lwd=
         newi <- rbind(newi,ii)
     }
     ## NOW GET POINT INFO FROM LEGINFO FILE AND PLOT WITH POSITIONS IN newi
-    p <- r <- co <- c()
-    for(i in newi$EthnicGroup)
-    {
-        ii <- leginfo[leginfo$EthnicGroup==i,]
-        p <- c(p,ii$poppch)
-        r <- c(r,ii$rim)
-        co <- c(co,as.character(ii$Colour))
-    }
-    
-    pntinfo <- cbind(ll,co,p,r)
-    pntcol <- rep("#000000",nrow(ll))
-    pntcol[pntinfo$r==1]  <- as.character(pntinfo$co)[pntinfo$r==1]
-    pntinfo <- cbind(pntinfo,pntcol)
-    points(newi$newlong,newi$newlat,pch=pntinfo$p,cex=pt_cex,lwd=pt_lwd,bg=as.character(pntinfo$co),col=pntcol)
+    pops <- newi$EthnicGroup
+    pntinfo <- getPopSymbols(pops,leginfo)
+    pntinfo <- cbind(ll,pntinfo)
+    points(newi$newlong,newi$newlat,
+           pch=as.numeric(as.character(pntinfo$pch2plot)),
+           bg=as.character(pntinfo$col2plot),
+           col=as.character(pntinfo$rim2plot),
+           cex=pt_cex,lwd=pt_lwd)
     return(pntinfo)
     
 }
