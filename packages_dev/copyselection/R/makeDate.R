@@ -1,4 +1,4 @@
-#' this is an internal function that generates a date from a time in generations
+#' this is an internal function that turns an FS type matrix into rows averaged across clusters/groups
 #'
 #' This function converts a date in generations to a date in time.
 #' @param x a time in generations
@@ -10,13 +10,20 @@
 #' @examples
 #' makeDate(20, gen_length=30,)
 
-makeDate <- function(x, year0=1950, gen_length=29, add_BCE=TRUE){
-    y <- round(year0-((x+1)*gen_length),0)
-    if(is.na(y)){
-        y <- NA
-    } else   
-        if(add_BCE == TRUE & y < 0) {
-            y <- paste0(-y,"B")
+rowsAsMapClusts <- function(x,y1,stat=mean){# x is clusts as MapState, y1 is matrix
+    yMat <- c()
+    for(i in 1:length(x)){
+        clust.name <- names(x[i])
+        x1 <- as.vector(unlist(x[i]))
+        x1.length <- length(x1)
+        y.clust <- y1[x1,]
+        if(x1.length>1){
+            y2 <- apply(y.clust,2,stat)
+        } else {
+            y2 <- y.clust
         }
-    return(y)
+        yMat <- rbind(yMat,y2)
+        rownames(yMat)[length(yMat[,1])] <- clust.name
+    }
+    return(yMat)
 }

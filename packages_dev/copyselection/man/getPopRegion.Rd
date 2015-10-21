@@ -4,12 +4,14 @@
 \alias{getPopRegion}
 \title{this is an internal function that converts a list of population names to regions}
 \usage{
-getPopRegion(pops, popkey)
+getPopRegion(pops, popkey, subname = TRUE)
 }
 \arguments{
 \item{pops}{a list of names of ethnic groups}
 
 \item{popkey}{a table with at least two columns: Ethnic_Group which is the population that you want to look up and RegionM which is the region that the Ethnic_Group}
+
+\item{subname}{should the subnames of populations like FULAI be used to query the table, or should FULA be used? Defaults to TRUE}
 }
 \value{
 returns a vector of regions
