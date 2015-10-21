@@ -195,7 +195,7 @@ if(useallsamps == TRUE) for(i in seq(1,nrow(ind_copy_probs),by=10))   v <- rbind
 if(useallsamps == FALSE) v <- ind_copy_probs[seq(samp2use,nrow(ind_copy_probs),by=10),]
 
 ## NULL SNP LIKELIHOODS
-snp_liks <- apply(lines4,1,function(x)loglik(v,donor_hap_vec[x],nsamps=n_samps,useall=useallsamps,slike=samp2use))
+snp_liks <- apply(lines4,1,function(x){loglik(v,donor_hap_vec[x],nsamps=n_samps,useall=useallsamps,slike=samp2use)})
 
 ## NOW FIND MLE OF LAMBDA
 mle <- matrix(0,nrow=n_snps,ncol=2*n_regs2)
@@ -212,27 +212,16 @@ for(i in 1:n_snps)
     	if(reg_id != self_reg)
     	{
             	lambda <- 0
-    	        opt1 <- optim(lambda,par.loglik,
+            	opt1 <- optim(lambda,par.loglik,
             	              data=donor_hap_vec[lines4[i,]],
-                    	      nsamps=n_samps,useall=useallsamps,slike=samp2use,colindex=reg_index,v=v,
-                          	      method="Nelder-Mead")
-    	        mle[i,grep(reg_id,colnames(mle))]  <- c(-opt1$value,opt1$par)
+            	              nsamps=n_samps,useall=useallsamps,
+            	              slike=samp2use,colindex=reg_index,v=v,
+            	              method="Nelder-Mead")
+                mle[i,grep(reg_id,colnames(mle))]  <- c(-opt1$value,opt1$par)
     	}
     }
 }
 
-
 mle <- cbind(snps2,snp_liks,mle)
 colnames(mle)[colnames(mle)=="snp_liks"] <- "null.likelihood"
 write.table(mle,file=out_file,quote=F,col.names=T,row.names=F)
-
-
-
-### NOW RUNNING ON EACH CHROMOSOME SEPARATELY ###
-### CODE BELOW WAS FROM RUNNING IN SERIES ###
-#    if(chrom == 1 ) mle2 <- mle
-#    if(chrom != 1 ) mle2 <- rbind(mle2,mle)
-#    
-#}
-#write.table(mle2,file=out_file,quote=F,col.names=T,row.names=F)
-

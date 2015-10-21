@@ -1,54 +1,59 @@
-#Get the command line arguments
-#args = commandArgs(TRUE);
-#print(args);
-#for(i in 1:length(args)) eval(parse(text=args[[i]]))
-#counter = Sys.getenv(c("SGE_TASK_ID"));
-#counter = 8;
-#header = 5e4;
-#print(counter);
+###################################################################
+###################################################################
+##################
+## SCRIPT TO GENERATE MULTI-VARIATE NORM TEST FOR INDIVIDUAL SNPS
+## COMPARED TO GENOME(CHROMOSOME)-WIDE PAINTINGS
+##################
+###################################################################
+###################################################################
+## NB THIS IS AN UPDATE OF CHRIS'S Copy_Deviant_v5.R
 
+## EXAMPLE R  < /well/malariagen/malariagen/human/george/copy_selection/MVN_CopySelection.R FULAI --no-save > /well/malariagen/malariagen/human/george/copy_selection/Copy_Selection_v5_FULAI.out 
+
+options(stringsAsFactors=FALSE);
 temp <- commandArgs()
+pop <- temp[2]
+
+## NB: TO DO - EDIT SO THAT INPUT IS THE SAME AS LRT_CopySelection.R ##
+#in_file <- temp[4]
+#id_file <- temp[5]
+#out_file<- temp[6]
 
 #Get the population for analysis
 
-indir <- "/well/malariagen/malariagen/human/george/copy_selection/"
-sampdir <- "/data/bayes/users/george/popgen/analysis3/chromopainter/outputcopyprobs/"
-snpdir <- "/data/bayes/users/george/popgen/analysis3/chromopainter/snpfiles/"
+in_dir <- "/well/malariagen/malariagen/human/george/copy_selection/"
+samp_dir <- "/data/bayes/users/george/popgen/analysis3/chromopainter/outputcopyprobs/"
+snp_dir <- "/data/bayes/users/george/popgen/analysis3/chromopainter/snpfiles/"
 pop_file <- paste(indir,"populationOverviewCopyProbs.txt",sep="")
 popkey <- read.table(pop_file,header=T)
-#pop = as.character(popkey[counter,1]);
-pop <- temp[2]
-outfile <- paste(indir,"Copy_Selection_deviant_v5_",pop,".csv",sep="")
+
+
+out_file <- paste(in_dir,"Copy_Selection_deviant_v5_",pop,".csv",sep="")
 header=-1
 
-if(!file.exists(outfile))
+if(!file.exists(out_file))
 {
-    tmp <- read.table(paste(sampdir,pop,"nolocalAllChromsPP.samples.out.gz",sep=""),header=FALSE,as.is=TRUE,nrow=header);
+    tmp <- read.table(paste(samp_dir,pop,"nolocalAllChromsPP.samples.out.gz",sep=""),header=FALSE,as.is=TRUE,nrow=header);
     tmp <- as.matrix(tmp);
 
 #Just one of the samples
-
     subset <- seq(1,ncol(tmp),by=1);
     tmp <- t(as.matrix(tmp[,subset]));
-
 ## x11(type="Xlib");
 ## rho <- cor(haps)
 ## image(t(cor(haps)));
 
 #Read the population and individual information
-    options(stringsAsFactors=FALSE);
-    popkey <- read.table(pop_file,header=T)
-    id_file <- paste(indir,pop,"nolocal.idfile.txt",sep="");
+    id_file <- paste(in_dir,pop,"nolocal.idfile.txt",sep="");
     ids <- read.table(id_file)
     ids <- ids[rep(1:nrow(ids),each=2),];
     own_reg <- as.character(popkey$Region[popkey$Ethnic_Group==pop])
-    snp_file <- paste(snpdir,"AllPops330Kphased.legend.gz",sep="");
+    snp_file <- paste(snp_dir,"AllPops330Kphased.legend.gz",sep="");
     snps <- read.table(snp_file,header=F);
     colnames(snps) <- c("chr","rsid","pos","a0","a1")
     haps <- array(NA,dim(tmp));
 
 ##Reassign copying into broad regions
-
     regions <- unique(as.character(popkey[,2]));
     for(i in 1:length(regions))
     {
@@ -114,7 +119,7 @@ if(!file.exists(outfile))
     }
 
     #x11(type="Xlib",width=15);
-#barplot(t(counts[1,,]),beside=FALSE,border=NA,space=0,col=2:7);
+    #barplot(t(counts[1,,]),beside=FALSE,border=NA,space=0,col=2:7);
     random <- sample(1:nsnps,500);
     tmp <- deviant[,,which(colSums(avg) != 0)];
     x <- array(0,dim(tmp)[-1])
