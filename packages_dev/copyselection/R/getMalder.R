@@ -20,8 +20,8 @@ getMalder <- function(file_name, pop1)
         if(length(res)>1) res <- res[length(res)-1]
         num_events <- as.numeric(strsplit(res,split="\\_")[[1]][2])
         ## GET DATA
-        if(num_events == 1 ) one_event <- c(one_event,pop1)
-        if(num_events > 2) multi_events <- c(multi_events,pop1)
+        #if(num_events == 1 ) one_event <- c(one_event,pop1)
+        #if(num_events > 2) multi_events <- c(multi_events,pop1)
         print(c(pop1,num_events))
         if(num_events > 2) num_events <- 2
         if(num_events == 1)

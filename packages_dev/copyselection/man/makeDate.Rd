@@ -2,7 +2,7 @@
 % Please edit documentation in R/makeDate.R
 \name{makeDate}
 \alias{makeDate}
-\title{this is an internal function that generates a date from a time in generations}
+\title{this is an internal function that turns an FS type matrix into rows averaged across clusters/groups}
 \usage{
 makeDate(x, year0 = 1950, gen_length = 29, add_BCE = TRUE)
 }

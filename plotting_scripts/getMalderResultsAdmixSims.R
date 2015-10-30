@@ -14,7 +14,8 @@ setwd(paste0(main_dir,"popgen/"))
 ###########################################################
 ## DEFINE DATAFILES
 popkey_file <- "data/MalariaGenAdmixturePopulationOverview.txt"
-malder_out <- paste0("~/R/Copy/Rprojects/AfricaPOPGEN/manuscript/f3tables/AllPopsMalderFinalALL")
+malder_out <- paste0("~/R/Copy/Rprojects/AfricaPOPGEN/manuscript/f3tables/AllPopsMalderFinalAdmixSimsALL")
+sim_pops <- scan("/mnt/kwiat/well/human/george/admix_sims/chromopainter/admix_sims.pops",what="char")
 
 ## LOAD POPKEY FILE ##
 popkey <- read.table(popkey_file,header=T,as.is=T)
@@ -28,8 +29,8 @@ popplotorder <- popplotorder[c(1:16,18:49)]
 poplist <- factor(popplotorder,levels=popplotorder)
 poplist<- as.matrix(poplist)
 n_pops <- nrow(poplist)
-in_dir <- "/mnt/kwiat/data/bayes/users/george/popgen/analysis3/alder/output/"
-analys <- c("","CeuMap","AfrMap")
+in_dir <- "/mnt/kwiat/well/human/george/admix_sims/malder/output/"
+analys <- c("") #,"CeuMap","AfrMap")
 
 ## GET MALDER FOR DIFFERENT MAP ANALYSES ##
 malder_dates <- c()
@@ -39,9 +40,9 @@ for(analy in analys)
     data_suff <- paste0("_alderallrefsmalder",analy,".data")
     ## GET RESULTS FOR ALL POPS IN POPLIST ##
     all_res2 <- c()
-    for(i in 1:nrow(poplist))
+    for(i in sim_pops)
     {
-        pop1 <- as.character(poplist[i,1])
+        pop1 <- i
         file_name <- paste0(in_dir,pop1,data_suff)
         if(file.exists(file_name))
         {
@@ -55,12 +56,12 @@ for(analy in analys)
     all_res2 <- data.frame(all_res2)
     colnames(all_res2)[1] <- "pop"
     ## GET RESULTS FOR COMPARISON PLOTS ##
-    malder_d <- matrix(0,nr=nrow(poplist),nc=4)
-    rownames(malder_d) <- poplist
+    malder_d <- matrix(0,nr=length(sim_pops),nc=4)
+    rownames(malder_d) <- sim_pops
     colnames(malder_d) <- c("date1","date1.ci","date2","date2.ci")
-    for(i in (1:nrow(poplist)))
+    for(i in sim_pops)
     {
-        pop1 <- as.character(poplist[i,1])
+        pop1 <- i
         if(pop1%in%as.character(unique(all_res2$pop1)))
         {
             tt <- all_res2[all_res2[,"pop"]==pop1,]
@@ -98,11 +99,11 @@ if(is.null(malder_results$pop1[1]))
 
 ### COMPUTE Z-SCORES  ##
 all_z <- c()
-for(i in (1:nrow(poplist)))
+for(i in sim_pops)
 {
-    for(analy in c("HAPMAP",analys[2:3]))
+    for(analy in c("HAPMAP")) #,analys[2:3]))
     {
-        pop1 <- as.character(poplist[i,1])
+        pop1 <- i
         print(paste("getting top comps for", pop1, "for the", analy, "analysis"))
         tt <- malder_results[malder_results$pop==pop1 & malder_results$analy==analy,]
         tt <- tt[order(tt$tpop1,tt$tpop2,as.numeric(as.character(tt$amp0)),decreasing=T),]
@@ -149,11 +150,11 @@ getZ <- function(tt,group=eurasia,ev_amp="amp0")
 
 
 t_res <- c()
-for(i in (1:nrow(poplist)))
+for(i in sim_pops)
 {
-    for(analy in c("HAPMAP",analys[2:3]))
+    for(analy in c("HAPMAP"))#,analys[2:3]))
     {
-        pop1 <- as.character(poplist[i,1])
+        pop1 <- i
         tt <- all_z[all_z$pop==pop1 & all_z$analy == analy,]
         if(nrow(tt)>0)
         {
@@ -275,4 +276,4 @@ print(tmp.tab,include.rownames=F,floating=F,include.colnames=T,
       hline.after=c(-1,0,nrow(tmp.tab)),size="tiny",
       sanitize.text.function = function(x){x}) 
 
-system(paste0("sed -i 's#_#-#g' ~/R/Copy/Rprojects/AfricaPOPGEN/manuscript/f3tables/AllPopsMalderFinalALL.tex"))
+system(paste0("sed -i 's#_#-#g' ",malder_out,".tex"))

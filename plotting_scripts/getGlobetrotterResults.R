@@ -80,7 +80,7 @@ for(pop in popplot[1:48])
     if(file.exists(infile))
     {
         ## GET MAIN DATA
-        ll <- getGlobetrotter(infile=infile,donors)
+        ll <- getGlobetrotter(infile,donors)
         ## GET ONE DATE BOOTSTRAPS
         ld <- getGlobetrotterDates(infile_dates)
         ## GET TWO DATE BOOTSTRAPS
@@ -404,6 +404,8 @@ write.table(final.res2plot,file=paste0(main_dir,"popgen/data/MalariaGenGlobetrot
 write.table(admixturesources2,paste0(main_dir,"popgen/data/MalariaGenGlobetrotterAdmixtureSources2.txt"))
 write.table(admixturesources3,paste0(main_dir,"popgen/data/MalariaGenGlobetrotterAdmixtureSources3.txt"))
 write.table(admixturesources4,paste0(main_dir,"popgen/data/MalariaGenGlobetrotterAdmixtureSources4.txt"))
+write.table(dateboots,paste0(main_dir,"popgen/data/MalariaGenGlobetrotterOneDateBootstraps.txt"))
+write.table(date2boots,paste0(main_dir,"popgen/data/MalariaGenGlobetrotterTwoDateBootstraps.txt"))
 
 #############################################################
 res.tabB <- xtable(res.tabB,align="|r|r|ccccccccccccccccccccccccc|")
