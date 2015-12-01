@@ -10,7 +10,7 @@
 #' addGTresults(pop)
 
 
-addGTresults <- function(pops, rev_pops){
+addGTresults <- function(pltable, rev_pops){
     all_dates <- all_plot_mat <- all_src_mat <- dboots <- allsources <- c()
     for(pop in as.character(pltable$Cluster))
     {    
@@ -137,13 +137,20 @@ addGTresults <- function(pops, rev_pops){
                 gen <- as.numeric(gen)
             }
             gens <- pltable$Date2a.CI[pltable$Cluster==pop]
-            gens <- strsplit(gsub("\\)","",gsub("\\(","",gens)),split="\\-")[[1]]
-            revg <- grep("B",gens)
-            gens <- gsub("B","",gens)
-            gens <- as.numeric(gens)
-            if(length(revg>0)) gens[revg] <- -gens[revg]
-            gen1 <- as.numeric(gens[1])
-            gen2 <- as.numeric(gens[2])
+            if(!is.null(gens))
+            {
+                gens <- strsplit(gsub("\\)","",gsub("\\(","",gens)),split="\\-")[[1]]
+                revg <- grep("B",gens)
+                gens <- gsub("B","",gens)
+                gens <- as.numeric(gens)
+                if(length(revg>0)) gens[revg] <- -gens[revg]
+                gen1 <- as.numeric(gens[1])
+                gen2 <- as.numeric(gens[2])
+            } else
+            {
+                gen1 <- NA
+                gen2 <- NA
+            }
             src1 <- admixturesources2[paste(pop,a,5,sep="."),]
             src2 <- admixturesources2[paste(pop,a,6,sep="."),]
             src3 <- admixturesources2[paste(pop,a,7,sep="."),]
@@ -217,14 +224,20 @@ addGTresults <- function(pops, rev_pops){
                     gen <- as.numeric(gen)
                 }
                 gens <- pltable$Date.CI[pltable$Cluster==pop]
-                gens <- strsplit(gsub("\\)","",gsub("\\(","",gens)),split="\\-")[[1]]
-                revg <- grep("B",gens)
-                gens <- gsub("B","",gens)
-                gens <- as.numeric(gens)
-                if(length(revg>0)) gens[revg] <- -gens[revg]
-                gen1 <- as.numeric(gens[1])
-                gen2 <- as.numeric(gens[2])
-                #if(pop == "NAMA") prop <- 1-prop
+                if(!is.null(gens))
+                {
+                    gens <- strsplit(gsub("\\)","",gsub("\\(","",gens)),split="\\-")[[1]]
+                    revg <- grep("B",gens)
+                    gens <- gsub("B","",gens)
+                    gens <- as.numeric(gens)
+                    if(length(revg>0)) gens[revg] <- -gens[revg]
+                    gen1 <- as.numeric(gens[1])
+                    gen2 <- as.numeric(gens[2])
+                } else
+                {
+                    gen1 <- NA
+                    gen2 <- NA
+                }
             }
             
             if(res == "2D")
@@ -241,13 +254,20 @@ addGTresults <- function(pops, rev_pops){
                     gen <- as.numeric(gen)
                 }
                 gens <- pltable$Date2b.CI[pltable$Cluster==pop]
-                gens <- strsplit(gsub("\\)","",gsub("\\(","",gens)),split="\\-")[[1]]
-                revg <- grep("B",gens)
-                gens <- gsub("B","",gens)
-                gens <- as.numeric(gens)
-                if(length(revg>0)) gens[revg] <- -gens[revg]
-                gen1 <- as.numeric(gens[1])
-                gen2 <- as.numeric(gens[2])
+                if(!is.null(gens))
+                {
+                    gens <- strsplit(gsub("\\)","",gsub("\\(","",gens)),split="\\-")[[1]]
+                    revg <- grep("B",gens)
+                    gens <- gsub("B","",gens)
+                    gens <- as.numeric(gens)
+                    if(length(revg>0)) gens[revg] <- -gens[revg]
+                    gen1 <- as.numeric(gens[1])
+                    gen2 <- as.numeric(gens[2])
+                } else
+                {
+                    gen1 <- NA
+                    gen2 <- NA
+                }
                 
                 if(pop %in% rev_pops) prop <- 1-prop
             }
@@ -271,3 +291,4 @@ addGTresults <- function(pops, rev_pops){
     }
     return(list(all_dates,all_plot_mat,all_src_mat,dboots,allsources))
 }
+

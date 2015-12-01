@@ -11,19 +11,25 @@ library(xtable)
 setwd(paste0(main_dir,"popgen/"))
 ###########################################################
 ## DEFINE DATAFILES
-popkey_file <- "data/MalariaGenAdmixturePopulationOverview.txt"
-
+popkey_file <- "data/MalariaGenAdmixturePopulationOverviewNSAA.txt"
+leginfo_file <- "data/MalariaGenAdmixturePopulationKey.txt"
 ## LOAD POPKEY FILE ##
 popkey <- read.table(popkey_file,header=T,as.is=T)
 popkey$Ethnic_Group <- toupper(popkey$Ethnic_Group)
+popkey$Ethnic_Group[popkey$Ethnic_Group=="SEMI-BANTU"] <- "SEMI.BANTU"
+## LOAD LEGEND INFO
+leginfo <- read.table(leginfo_file, header = T, comment.char = "")
 
 ### DEFINE SOME PLOTTING VARIABLES ##
 dateLabelCex=1
 datelines=c(-1000,-500,0,500,1000,1500)
 yAxisLim=c(-1000,2000)
-pcolshex <- c("#0000CD", "#03B4CC", "#A65628", "#FF7F00", "#984EA3", "#4DAF4A", "#CCCC00")[c(1,2,4,5,3,6,7)]
+## OLD VERSION OF THE COLOURS
+#pcolshex <- c("#0000CD", "#03B4CC", "#A65628", "#FF7F00", "#984EA3", "#4DAF4A", "#CCCC00")[c(1,2,4,5,3,6,7)]
+## NEW COLOURS THAT DIFFERENTIATE AA AND NS
+pcolshex <- c("#0000CD","#03B4CC","#FF7F00","#984EA3","#FF69B4","#A65628","#4DAF4A","#CCCC00")
 ancreg_list <- c("Western_Africa_Niger-Congo","Central_West_Africa_Niger-Congo",
-                 "East_Africa_Niger-Congo","East_Africa_Nilo-Saharan",
+                 "East_Africa_Niger-Congo","East_Africa_Nilo-Saharan","East_Africa_Afro-Asiatic",
                  "South_Africa_Niger-Congo","South_Africa_KhoeSan","Eurasia" )
 popplot <- scan("/mnt/kwiat/home/popgen/scripts/poplists/MalariaGen23EthnicGroups1KGSouthAfricaFinalAnalysisPopsSSAonlyOrder.txt",what="char")
 popplot <- popplot[popplot!="SEMI-BANTU"]
@@ -36,10 +42,13 @@ final.res2plot <- read.table("data/MalariaGenGlobetrotter2plot.txt",header=T,row
 admixturesources2 <- admixturesources2[,levels(popplot)]
 dateboots <- read.table("data/MalariaGenGlobetrotterOneDateBootstraps.txt",header=T,row.names=1,as.is=T)
 date2boots <- read.table("data/MalariaGenGlobetrotterTwoDateBootstraps.txt",header=T,row.names=1,as.is=T)
+best_ald <- read.table("data/MalariaGenBestAlder.txt",header=T,as.is=T,comment.char="",fill=T)
+
 
 ## DEFINE THE REGION AND COLOURS FOR EACH OF THE DIFFERENT SOURCES
 srcreg <- getPopRegion(tidyNames(colnames(admixturesources2),fula=T),popkey)
 regions <- as.character(ancreg_list)
+srcreg[tidyNames(colnames(admixturesources2),fula=T) == "KARRETJIE"] <- "South_Africa_KhoeSan"
 srcreg <- factor(srcreg,levels=regions)
 srccols <- pcolshex[srcreg]
 srccols <- as.vector(srccols)
@@ -62,7 +71,7 @@ noprop <- FALSE ## USE ACTUAL PROPORTIONS IN SOURCE BAR CHARTS?
 rev_pops <- c("KHWE","AMAXHOSA","SEBANTU","MALAWI")
 pops <- as.character(pltable$Cluster)
 ## I'VE ADDED A FUNCTION TO PULL THESE THINGS OUT
-tempresults <- addGTresults(pops,rev_pops)
+tempresults <- addGTresults(pltable,rev_pops)
 all_dates <- tempresults[[1]]
 all_plot_mat <- tempresults[[2]]
 all_src_mat <- tempresults[[3]]
@@ -71,6 +80,23 @@ allsources <- tempresults[[5]]
 
 
 ##################################################################################
+## LOAD INDIVIDUAL CLUSTER ASSIGNMENT:: NEEDS SERVER ACCESS
+final_clusts <- vector("list",length(popplot))
+for(i in 1:length(popplot))
+{
+    ii <- as.character(popplot[i])
+    names(final_clusts)[i] <- ii
+    if(ii =="SEMI.BANTU") ii <- "SEMI-BANTU"
+    iinds <- scan(paste0("/mnt/kwiat/home/popgen/scripts/finalpoplists/",ii,"finalinds.txt"),what="char")
+    final_clusts[[i]] <- iinds
+}
+paintedinds <- read.table("/mnt/kwiat/data/bayes/users/george/popgen/analysis3/chromopainter/samplelists/MalariaGen23EthnicGroups1KGSouthAfricaNoAmericaFinalCP.inds",sep=" ")
+
+## CHANGE ACTUAL SAMPLE IDS TO CP LABELS
+final_clusts2<- lapply(final_clusts,function(x){as.character(paintedinds[match(unlist(x),paintedinds[,2]),1])})
+
+##################################################################################
+
 ## ORDER GROUPS BY THE NORMAL POPKEY ORDER
 roword <- rownames(all_dates)
 roword <- as.character(sapply(roword,function(x){gsub("\\_a","",x)}))
@@ -80,7 +106,7 @@ all_dates <- all_dates[roword,]
 
 ## MAKE SOME NICE REGION LABELS
 regions2 <- c("Western NC","Central West NC","Southern NC",
-              "Eastern NC", "Eastern NS/AA", "Southern KS",
+              "Eastern NC", "Eastern NS","Eastern AA", "Southern KS",
               "Eurasia")
 regions2 <- toupper(regions2)
 ##################################################################################
@@ -88,12 +114,13 @@ regions2 <- toupper(regions2)
 ## WE'LL SELECT WHICH TO PLOT LATER 
 all_src_mat <- matrix(0,ncol=length(popkey$Ethnic_Group),nrow=0)
 all_predmat <- matrix(0,ncol=length(popkey$Ethnic_Group),nrow=length(popkey$Ethnic_Group))
-rownames(all_predmat) <- colnames(all_predmat) <- colnames(all_src_mat) <- colnames(admixturesources2)[21:ncol(admixturesources2)]
+rownames(all_predmat) <- colnames(all_predmat) <- colnames(all_src_mat) <- colnames(admixturesources2)
 for(i in 1:ncol(all_plot_mat))
 {
     pop <- colnames(all_plot_mat)[i]
     pop1 <- gsub("\\_a","",pop)
-    reg <- as.character(popkey$RegionM[popkey$Ethnic_Group==gsub("\\.","\\-",pop1)])
+    reg <- as.character(popkey$RegionM[popkey$Ethnic_Group==pop1])
+    if(reg == "East_Africa_Afro-Asiatic") reg <- "East_Africa_Nilo-Saharan"
     predmat <- read.table(paste0("/mnt/kwiat/data/bayes/users/george/popgen/analysis3/globetrotter/input/",
                                  "MalariaGen23EthnicGroups1KGSouthAfricaNoAmericaFinal",reg,".chunklengths.out"),
                           header=T,row.names=1)
@@ -102,7 +129,7 @@ for(i in 1:ncol(all_plot_mat))
     rownames(predmat) <- gsub("\\-","\\.",rownames(predmat))
     s1 <- unlist(all_plot_mat[1:60,i])
     s2 <- unlist(all_plot_mat[62:121,i])
-    names(s1) <- names(s2) <- colnames(admixturesources2)[21:ncol(admixturesources2)]
+    names(s1) <- names(s2) <- colnames(admixturesources2)
     cv1 <- apply(predmat[names(s1),]*s1,2,sum)
     cv2 <- apply(predmat[names(s2),]*s2,2,sum)
     add <- colnames(all_src_mat)[!colnames(all_src_mat)%in%names(cv1)]
@@ -132,23 +159,48 @@ for(i in 1:ncol(all_plot_mat))
 ##################################################################################
 ## PULL IN THE RESULTS OF THE MIXTURE MODEL (RUN ELSEWHERE)
 mixmat <- read.table("data/Malgen23EthnicGroups1KGNoAmericaFinalAnalysisNNLS.txt",header=T,row.names=1,as.is=T)
-
+## EDIT POPKEY TO GIVE A BRAND NEW COLOUR TO THE FULANI
+popkey$RegionM[popkey$Ethnic_Group == "FULAI"] <- "Fulani"
+popkey$RegionM[popkey$Ethnic_Group == "SEMI.BANTU"] <- "Semi"
+##popkey$RegionM[popkey$Ethnic_Group == "ANUAK"] <- "Anuak"
+ancreg_list <- c(ancreg_list,"Fulani","Semi")
+pcolshex <- c(pcolshex,"gold4","#FF001E")
+## reorder the lists
+neword <- c(1,9,2,10,3,4,5,6,7,8)
+ancreg_list <- ancreg_list[neword]
+pcolshex <- pcolshex[neword]
 ##################################################################################
 ## PLOT
-#pdf("figure/GLOBETROTTERresults.pdf",height=9,width=9)
-    x11(height=9,width=9)
+pdf("figures/GLOBETROTTERresultsAll2D.pdf",height=9,width=9)
     layout(matrix(c(1,1,1,2,2,2,3,3,3,4,4,4,5,6,7),3,5),
            widths=c(4,0.75,0.75,0.75,2.75),heights=c(3,3,3))
-    par(mar=c(4,14,4,0.5))
+    topmar <- 4
     n_pops <- 48
+
+### below for gambia only plot
+# pdf("figures/GLOBETROTTERresultsGAMBIA.pdf",height=4,width=9)
+# layout(matrix(c(1,1,1,2,2,2,3,3,3,4,4,4,5,6,7),3,5),
+#        widths=c(4,0.75,0.75,0.75,2.75),heights=c(3,0,0))
+#     topmar <- 8
+#     n_pops <- 12
+
+    par(mar=c(4,14,topmar,0.5))
     d_pops <- gsub("\\_a","",rownames(all_dates))
+    x_labs3 <- c(2000,0,-2000,-5000)
+    x_labs3char <- c("2000\nCE",0,"2000\nBCE","5000\nBCE")
+    x_max <- min(x_labs3)
+
+
+    poplabpos <- 4600
+    ev1pos1 <- 4100
+    ev1pos2 <- 3600
+    ev2pos1 <- 3100
+    ev2pos2 <- 2600
+
     ## EMPTY PLOT FOR DATES
     plot(0,0,xlim=rev(range(x_labs3)),
          ylim=c(n_pops,1),type="n",axes=F,xlab="",ylab="")
-    text(5000,-1,labels=LETTERS[1],adj=0,las=1,cex=2,lwd=3,xpd=T)
-    x_labs3 <- c(2000,0,-2000,-5000,-10000)
-    x_labs3char <- c("2000\nCE",0,"2000\nBCE","5000\nBCE","10000\nBCE")
-    x_max <- min(x_labs3)
+    text(poplabpos+2000,-1,labels=LETTERS[1],adj=0,las=1,cex=2,lwd=3,xpd=T)
     axis(1,at=x_labs3,labels=x_labs3char,cex.axis=1,tick=F,padj=0.5)
     for(j in x_labs3) abline(v=j,lty=2)
     mtext("Date of Admixture",1,line=3)
@@ -186,6 +238,8 @@ mixmat <- read.table("data/Malgen23EthnicGroups1KGNoAmericaFinalAnalysisNNLS.txt
         }
         
         for(i in 1:nrow(all_dates))
+#         gampops <- c("JOLA","FULA","MANDINKA","WOLLOF","MANJAGO","SERERE","SEREHULE","MALINKE","BAMBARA","YORUBA")
+#         for(i in (1:nrow(all_dates))[tidyNames(gsub("_a","",rownames(all_dates)),fula=F)%in%gampops])
         {
             pop <- rownames(all_dates)[i]
             poppos <- (1:length(poporder))[poporder%in%gsub("\\_a","",pop)]
@@ -194,7 +248,7 @@ mixmat <- read.table("data/Malgen23EthnicGroups1KGNoAmericaFinalAnalysisNNLS.txt
             dh <- as.numeric(all_dates[pop,3])
             dl <- as.numeric(all_dates[pop,2])
             prop <- as.numeric(all_dates[pop,4])
-            if(pop == "ARI") d <- -d ## not sure why this wasn't reversed before
+            #if(pop == "ARI") d <- -d ## not sure why this wasn't reversed before
             if(run == 2) points(d,poppos,pch=20, cex=2)
             #if(run == 2) lines(x=c(dl,dh),y=c(poppos,poppos))
             if(run == 2) arrows(dl,poppos,dh,poppos,code=3,length=0.025,angle=90)
@@ -203,21 +257,50 @@ mixmat <- read.table("data/Malgen23EthnicGroups1KGNoAmericaFinalAnalysisNNLS.txt
                 pop2 <- gsub("\\_a","",pop)
                 anc1 <- pltable[pltable$Cluster==pop2,"best.source1"]
                 anc2 <- pltable[pltable$Cluster==pop2,"best.source2"]
+                if(pop2 %in% rev_pops)
+                {
+                    addancs <- c(pop,anc2,anc1,d)
+                } else
+                {
+                    addancs <- c(pop,anc1,anc2,d)
+                }
+                if(run == 1) popordertab <- rbind(popordertab,addancs)
+                
+                if(run == 2 & pop %in% rev_pops)
+                {
+                    anc1 <- pltable[pltable$Cluster==pop2,"best.source2"]
+                    anc2 <- pltable[pltable$Cluster==pop2,"best.source1"]
+                }
                 anc3 <- pltable[pltable$Cluster==pop2,"best.source1.ev2"]
                 anc4 <- pltable[pltable$Cluster==pop2,"best.source2.ev2"]
                 pcol1 <- pcolshex[ancreg_list==as.character(popkey$RegionM[popkey$Ethnic_Group==anc1])]
                 pcol2 <- pcolshex[ancreg_list==as.character(popkey$RegionM[popkey$Ethnic_Group==anc2])]
                 pcol3 <- pcolshex[ancreg_list==as.character(popkey$RegionM[popkey$Ethnic_Group==anc3])]
                 pcol4 <- pcolshex[ancreg_list==as.character(popkey$RegionM[popkey$Ethnic_Group==anc4])]
-                if(run == 2) points(3800,poppos,pch=15,col=pcol1,xpd=T,cex=2)
-                if(run == 2) points(3400,poppos,pch=15,col=pcol2,xpd=T,cex=2)
-                if(run == 2) points(3400,poppos,pch=22,xpd=T,cex=2,lwd=1.5)
+                if(run == 2) points(ev1pos1,poppos,pch=15,col=pcol1,xpd=T,cex=2)
+                if(run == 2) points(ev1pos2,poppos,pch=15,col=pcol2,xpd=T,cex=2)
+                if(run == 2)
+                {
+                    if(pop%in%rev_pops)
+                    {
+                        points(ev1pos1,poppos,pch=22,xpd=T,cex=2,lwd=1.5)
+                    } else
+                    {
+                        points(ev1pos2,poppos,pch=22,xpd=T,cex=2,lwd=1.5)
+                    }
+                }
                 if(res == "1MW")
                 {
-                    if(run == 2) points(3000,poppos,pch=15,col=pcol3,xpd=T,cex=2)
-                    if(run == 2) points(2600,poppos,pch=15,col=pcol4,xpd=T,cex=2)
-                    if(run == 2) points(2600,poppos,pch=22,xpd=T,cex=2,lwd=1.5)
+                    if(run == 2) points(ev2pos1,poppos,pch=15,col=pcol3,xpd=T,cex=2)
+                    if(run == 2) points(ev2pos2,poppos,pch=15,col=pcol4,xpd=T,cex=2)
+                    if(run == 2) points(ev2pos2,poppos,pch=22,xpd=T,cex=2,lwd=1.5)
                 } 
+             }
+            if(res %in% c("2D"))
+            {
+                pop2 <- gsub("\\_a","",pop)
+                anc1 <- pltable[pltable$Cluster==pop2,"best.source1.date1"]
+                anc2 <- pltable[pltable$Cluster==pop2,"best.source2.date1"]
                 if(pop2 %in% rev_pops)
                 {
                     addancs <- c(pop,anc2,anc1,d)
@@ -226,32 +309,33 @@ mixmat <- read.table("data/Malgen23EthnicGroups1KGNoAmericaFinalAnalysisNNLS.txt
                     addancs <- c(pop,anc1,anc2,d)
                 }
                 if(run == 1) popordertab <- rbind(popordertab,addancs)
-            }
-            if(res %in% c("2D"))
-            {
-                pop2 <- gsub("\\_a","",pop)
-                anc1 <- pltable[pltable$Cluster==pop2,"best.source1.date1"]
-                anc2 <- pltable[pltable$Cluster==pop2,"best.source2.date1"]
+                if(run == 2 & pop %in% rev_pops)
+                {
+                    anc1 <- pltable[pltable$Cluster==pop2,"best.source2"]
+                    anc2 <- pltable[pltable$Cluster==pop2,"best.source1"]
+                }
                 anc3 <- pltable[pltable$Cluster==pop2,"best.source1.date2"]
                 anc4 <- pltable[pltable$Cluster==pop2,"best.source2.date2"]
                 pcol1 <- pcolshex[ancreg_list==as.character(popkey$RegionM[popkey$Ethnic_Group==anc1])]
                 pcol2 <- pcolshex[ancreg_list==as.character(popkey$RegionM[popkey$Ethnic_Group==anc2])]
                 pcol3 <- pcolshex[ancreg_list==as.character(popkey$RegionM[popkey$Ethnic_Group==anc3])]
                 pcol4 <- pcolshex[ancreg_list==as.character(popkey$RegionM[popkey$Ethnic_Group==anc4])]
-                if(run == 2) points(3800,poppos,pch=15,col=pcol1,xpd=T,cex=2)
-                if(run == 2) points(3400,poppos,pch=15,col=pcol2,xpd=T,cex=2)
-                if(run == 2) points(3400,poppos,pch=22,xpd=T,cex=2,lwd=1.5)
-                if(run == 2) points(3000,poppos,pch=15,col=pcol3,xpd=T,cex=2)
-                if(run == 2) points(2600,poppos,pch=15,col=pcol4,xpd=T,cex=2)
-                if(run == 2) points(2600,poppos,pch=22,xpd=T,cex=2,lwd=1.5)
-                if(pop2 %in% rev_pops)
+                if(run == 2) points(ev1pos1,poppos,pch=15,col=pcol1,xpd=T,cex=2)
+                if(run == 2) points(ev1pos2,poppos,pch=15,col=pcol2,xpd=T,cex=2)
+                if(run == 2)
                 {
-                    addancs <- c(pop,anc2,anc1,d)
-                } else
-                {
-                    addancs <- c(pop,anc1,anc2,d)
+                    if(pop%in%rev_pops)
+                    {
+                        points(ev1pos1,poppos,pch=22,xpd=T,cex=2,lwd=1.5)
+                    } else
+                    {
+                        points(ev1pos2,poppos,pch=22,xpd=T,cex=2,lwd=1.5)
+                    }
                 }
-                if(run == 1) popordertab <- rbind(popordertab,addancs)
+                
+                if(run == 2) points(ev2pos1,poppos,pch=15,col=pcol3,xpd=T,cex=2)
+                if(run == 2) points(ev2pos2,poppos,pch=15,col=pcol4,xpd=T,cex=2)
+                if(run == 2) points(ev2pos2,poppos,pch=22,xpd=T,cex=2,lwd=1.5)
             }
         }
         if(run == 1)
@@ -281,22 +365,22 @@ mixmat <- read.table("data/Malgen23EthnicGroups1KGNoAmericaFinalAnalysisNNLS.txt
     }
     for(i in 1:n_pops)
     {
-        axis(2,pos=4000,at=i,labels=tidyNames(poporder[i],fula=T),col.axis=y_ax_cols[i],las=2,tck=0,lwd=0,line=-0.5)
+        axis(2,pos=poplabpos,at=i,labels=tidyNames(poporder[i],fula=T),col.axis=y_ax_cols[i],las=2,tck=0,lwd=0,line=-0.5)
     }
     for(i in seq(0.5,(n_pops+1),1)) abline(h=i,lty=3,lwd=0.5)
-    lines(x=c(3200,3200),y=c(0,n_pops+1),lwd=1,xpd=T)
+    lines(x=c(median(c(ev1pos2,ev2pos1)),median(c(ev1pos2,ev2pos1))),y=c(0,n_pops+1),lwd=1,xpd=T)
     
-    text(y=-1,x=3600,labels="1ST EVENT",xpd=T,srt=35,adj=0)
-    text(y=-1,x=2800,labels="2ND EVENT",xpd=T,srt=35,adj=0)
-    
+    text(y=-1,x=median(c(ev1pos1,ev1pos2)),labels="1ST EVENT",xpd=T,srt=35,adj=0)
+    text(y=-1,x=median(c(ev2pos1,ev2pos2)),labels="2ND EVENT",xpd=T,srt=35,adj=0)
+
     ###################################################################
     ## PLOT NNLS MIXTURE MODEL
-    x1 <- mixmat[poporder,]
+    x1 <- mixmat[poporder,colnames(admixturesources2)]
     bp <- barplot(t(as.matrix(x1)),
                   yaxt="n",xlab="",beside=F,
                   main="",cex.main=0.75,border=NA,horiz=T,
                   col=srccols,xaxt="n",add=F,plot=F)
-    par(mar=c(4,0,4,0.5))
+    par(mar=c(4,0,topmar,0.5))
     plot(0,0,xlim=c(0,1),
          ylim=c(bp[length(bp)],bp[1]),type="n",axes=F,xlab="",ylab="")
     bp <- barplot(t(as.matrix(x1)),
@@ -315,7 +399,7 @@ mixmat <- read.table("data/Malgen23EthnicGroups1KGNoAmericaFinalAnalysisNNLS.txt
         pop2 <- as.character(poporder[i])
         if(pop2 %in% colnames(all_plot_mat)) plot_mat[,pop2] <- unlist(all_plot_mat[,pop2])
     }
-    par(mar=c(4,0,4,1))
+    par(mar=c(4,0,topmar,1))
     plot(0,0,xlim=c(0,1),
          ylim=c(bp[length(bp)],bp[1]),type="n",axes=F,xlab="",ylab="")
     barplot(plot_mat,col=c(srccols,"white",srccols),
@@ -331,7 +415,7 @@ mixmat <- read.table("data/Malgen23EthnicGroups1KGNoAmericaFinalAnalysisNNLS.txt
         pop2 <- paste0(poporder[i],"_a")
         if(pop2 %in% colnames(all_plot_mat)) plot_mat[,i] <- unlist(all_plot_mat[,pop2])
     }
-    par(mar=c(4,0,4,1))
+    par(mar=c(4,0,topmar,1))
     plot(0,0,xlim=c(0,1),
          ylim=c(bp[length(bp)],bp[1]),type="n",axes=F,xlab="",ylab="")
     barplot(plot_mat,col=c(srccols,"white",srccols),
@@ -348,12 +432,13 @@ mixmat <- read.table("data/Malgen23EthnicGroups1KGNoAmericaFinalAnalysisNNLS.txt
                      "Central West African Niger-Congo",
                      "East African Niger-Congo",
                      "South African Niger-Congo",
-                     "Nilo-Saharan / Afro-Asiatic",
+                     "East African Nilo-Saharan",
+                     "East African Afro-Asiatic",
                      "KhoeSan",
-                     "Eurasia",
-                     "main event ancestry")
-    l <- legend("top",legend=legend_text,pch=c(rep(15,7),22),
-                col=c(pcolshex[c(1:3,5,4,6,7)],"black"),bty="n",
+                     "Eurasia")
+    l <- legend("top",legend=c(legend_text,"main event ancestry"),
+                pch=c(rep(15,8),22),
+                col=c(pcolshex[c(1,3,5,8,6,7,9,10)],"black"),bty="n",
                 ncol=1,xpd=T,pt.cex=3,x.intersp=1,y.intersp=1.25,
                 pt.lwd=2,cex=1.25, title="Ancestry Region")
     par(mar=c(5,5,2,1))
@@ -516,7 +601,7 @@ mixmat <- read.table("data/Malgen23EthnicGroups1KGNoAmericaFinalAnalysisNNLS.txt
             gtdate <- c(gtdata$date.1D[gtdata$Cluster==i])
             gtdatel <- c(gtdata$date.1D.L[gtdata$Cluster==i])
             gtdateh <- c(gtdata$date.1D.H[gtdata$Cluster==i])
-            aldate <- as.character(best_ald$Date.Gens[best_ald$adm.pop==tidyNames(i)])
+            aldate <- as.character(best_ald$Date.Gens[best_ald$adm.pop==gsub("\\=","",tidyNames(i))])
             if(aldate != "")
             {
                 aldate1 <- round(as.numeric(strsplit(aldate,split=" ")[[1]][1]))

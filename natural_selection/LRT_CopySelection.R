@@ -1,4 +1,3 @@
-
 ###################################################################
 ###################################################################
 ##################
@@ -9,12 +8,12 @@
 ###################################################################
 
 temp <- commandArgs()
-#temp <- c("",
-#         "OROMO",
-#         22,
-#         "/data/bayes/users/george/popgen/analysis3/chromopainter/outputcopyprobs/OROMOnolocalAllChromsPP.samples.out.gz",
-#         "/well/malariagen/malariagen/human/george/chromopainter2/analysislists/OROMOnolocal.idfile.txt",
-#         "/data/bayes/users/george/popgen/analysis3/chromopainter/outputcopyprobs/OROMOnolocalAllChromsPP.likelihoods.gz")
+temp <- c("",
+        "FULAI",
+        22,
+        "/mnt/kwiat/data/bayes/users/george/popgen/analysis3/chromopainter/outputcopyprobs/FULAInolocalAllChromsPP.samples.out.gz",
+        "/mnt/kwiat/well/human/george/chromopainter2/analysislists/FULAInolocal.idfile.txt",
+        "/mnt/kwiat/data/bayes/users/george/popgen/analysis3/chromopainter/outputcopyprobs/FULAInolocalAllChromsPP.likelihoods.gz")
 
 pop <- temp[2]
 mainchrom <- temp[3]
@@ -22,14 +21,20 @@ in_file <- temp[4]
 id_file <- temp[5]
 out_file<- temp[6]
 
-###################################################################
+## ALL LOCAL PAINTINGS ARE STORED IN AN hdf5 FILE
+hdf5file <- '/mnt/kwiat/well/human/george/copy_selection/hdf5files/MalariaGen23EthnicGroups1KGSouthAfricaNoAmericaFinalChromoPainter.hdf5'
+
+
+library("rhdf5")
+library("bigmemory")
+
 ###################################################################
 ###################################################################
 ## SOME IMPORTANT VARIABLES
 options(scipen=999,digits=20)
 ## INFORMATION ON SNPS - CHROMOSOME,POSITION,ALLELES ETC
 ## DIRECTORY WITH FILE WITH SNP INFO IN THEM
-snp_dir <- "/data/bayes/users/george/popgen/analysis3/chromopainter/snpfiles/"
+snp_dir <- "/mnt/kwiat/data/bayes/users/george/popgen/analysis3/chromopainter/snpfiles/"
 snp_file_pre <- "AllPops330KChrom"
 snp_file_pos <- "phased.legend.gz"
 ## NUMBER OF SAMPLES TO USE TO GENERATE LIKELIHOODS
@@ -42,7 +47,7 @@ samp2use <- 1 ## IF useallsamps == FALSE, THEN USE THIS SAMPLE
 ## INFORMATION ON THE SAMPLES
 ## POPFILE MUST HAVE TWO COLUMNS: "Ethnic_Group" AND "Region"
 ## THIS FILE WILL BE READ TO GROUP POPULATIONS INTO REGIONS
-pop_file <- "/data/bayes/users/george/popgen/analysis3/chromopainter/analysislists/populationOverviewCopyProbs.txt"
+pop_file <- "/mnt/kwiat/data/bayes/users/george/popgen/analysis3/chromopainter/analysislists/populationOverviewCopyProbs.txt"
 popkey <- read.table(pop_file,header=T)
 ###################################################################
 ###################################################################
@@ -122,7 +127,8 @@ par.loglik <- function(v,data,nsamps=n_samps,useall=useallsamps,slike=samp2use,l
 ## 00 LOAD PAINTING SAMPLES
 ## LOAD SAMPLES: NOTE THESE ARE GENERATED USING THE PY-PROG
 ## AND SHOULD BE SNPS AS COLUMNS AND HAPS AS COLUMNS
-lines3 <- as.matrix(read.table(in_file,colClasses="integer"))
+#lines3 <- read.big.matrix(in_file,type="char",sep=" ")
+lines3 <- as.big.matrix(read.table(in_file,colClasses="integer"))
 
 ## 01 GET POPULATION INFO PLUS INFO ON REGIONS, NUMBERS OF HAPS ETC.
 ids <- read.table(id_file)    
@@ -137,6 +143,10 @@ n_haps <- sum(ids$V2==pop)*2
 ## REGIONAL IDENTITY
 donor_hap_vec <- c()
 for(i in 1:nrow(ids)) donor_hap_vec <- c(donor_hap_vec,ids$regions[i],ids$regions[i])
+pop_hap_vec <- c()
+for(i in 1:nrow(ids)) pop_hap_vec <- c(pop_hap_vec,as.character(ids$V2[i]),as.character(ids$V2[i]))
+id_hap_vec <- c()
+for(i in 1:nrow(ids)) id_hap_vec <- c(id_hap_vec,as.character(ids$V1[i]),as.character(ids$V1[i]))
 
 ## 02 LOAD SNP INFO
 snps <- c()
@@ -157,7 +167,7 @@ colnames(snps) <- c("chrom","rsid","pos","a0","a1")
 
 chrom <- mainchrom
 rows <- snps$chrom!=chrom
-lines4 <- lines3[rows,]
+#lines4 <- lines3[rows,]
 print(paste0("estimating likelihoods for chromosome: ", chrom, " in ", pop))
 ind_copy_probs <- matrix(0,nrow=n_haps*n_samps,ncol=n_regs)
 colnames(ind_copy_probs) <- 1:n_regs
@@ -169,7 +179,7 @@ for(i in 1:n_haps)
     colnames(cp) <- 1:n_regs
     for(j in 1:n_samps)
     {
-        tmp_cp <- table(donor_hap_vec[lines4[,(ind_vec[i]:(ind_vec[i]+9))[j]]])
+        tmp_cp <- table(donor_hap_vec[lines3[rows,(ind_vec[i]:(ind_vec[i]+9))[j]]])
         tmp_cp <- tmp_cp/sum(tmp_cp)
         cp[j,names(tmp_cp)] <- tmp_cp
     }
@@ -187,7 +197,7 @@ self_reg <- region_ids[!region_ids%in%region_ids2]
 ## 04 GET SNPS ON CURRENT CHROMOSOME AND ESTIMATE NULL LIKELIHOODS
 snps2 <- snps[snps$chrom==chrom,]
 n_snps <- nrow(snps2)
-lines4 <- lines3[snps$chrom==chrom,]
+lines4 <- as.big.matrix(lines3[snps$chrom==chrom,])
 
 ## DEFINE WHETHER WE AVERAGE COPY PROBS ACROSS ALL SAMPLES OR JUST USE ONE SAMPLE
 v <- c()
@@ -196,6 +206,25 @@ if(useallsamps == FALSE) v <- ind_copy_probs[seq(samp2use,nrow(ind_copy_probs),b
 
 ## NULL SNP LIKELIHOODS
 snp_liks <- apply(lines4,1,function(x){loglik(v,donor_hap_vec[x],nsamps=n_samps,useall=useallsamps,slike=samp2use)})
+
+## WE CAN CHECK IF A CHUNK IS 'GENUINE' BY LOOKING AT A DONOR AT A SNP
+## AND SEEING WHO THEY COPY AT THE SAME SNP
+## NEED TO CHECK DIMENSIONS OF THE FINAL FILE -- THEY MAY BE SWAPPED ROUND ...
+
+## let's look at th first snp on chrom 22
+s <- 1000
+## the haplotype that people copy
+test <- lines4[s,1:10]
+whocopied <- donor_hap_vec[test]
+## now i need to find the index for each haplotype in test
+## let's look at the first sample for the time being ...
+test <- (test*10)-9
+whocopiedcopies <- h5read(hdf5file,paste("/paintings/local/chrom",chrom,"/AllPops",sep=""),index=list(s,test))
+H5close()
+
+whocopied ## this is the region where the actual samples come from
+donor_hap_vec[whocopiedcopies] ## this is the region that the copied samples copy from 
+
 
 ## NOW FIND MLE OF LAMBDA
 mle <- matrix(0,nrow=n_snps,ncol=2*n_regs2)

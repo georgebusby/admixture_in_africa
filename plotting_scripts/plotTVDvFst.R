@@ -1,9 +1,7 @@
 #########################################################################
 ### PLOT OF TVD v F_st FOR PAPER 
 ## NOTE THAT I FIRST USED SMARTPCA TO GENERATE F_st OUTPUT
-
 setwd("~/repos/popgen/")
-
 ############################################################
 ## SOURCE SOME USEFUL FUNCTIONS FROM copyselection PACKAGE ##
 ## ~~~~~~~~~~~       !!! IN DEVELOPMENT !!!     ~~~~~~~~~~ ##
@@ -11,10 +9,11 @@ setwd("~/repos/popgen/")
 main_dir <- "~/repos/" ## where the code is kept
 source(paste0(main_dir,"popgen/packages_dev/functionWriter.R"))
 source(paste0(main_dir,"popgen/packages_ext/FinestructureLibrary.R"))
+setwd("~/repos/popgen/")
 ###########################################################
 ## DEFINE DATAFILES
 fst_file <- "data/AllPopsPairwiseFstResults.txt"
-popkey_file <- "data/MalariaGenAdmixturePopulationOverview.txt"
+popkey_file <- "data/MalariaGenAdmixturePopulationOverviewNSAA.txt"
 cv_file <- "data/MalariaGen23EthnicGroups1KGSouthAfricaNoAmericaFinalALL2.chunklengths.out"
 ## LOAD POPKEY FILE ##
 popkey <- read.table(popkey_file,header=T,as.is=T)
@@ -25,9 +24,9 @@ popkey$Ethnic_Group <- toupper(popkey$Ethnic_Group)
 popplot <- scan("data/MalariaGen23EthnicGroups1KGSouthAfricaFinalAnalysisPopsSSAonlyOrder.txt",what="char")
 popplot <- popplot[popplot!="SEMI.BANTU"]
 ## DEFINE COLOURS FOR REGIONS
-pcolshex <- c("#0000CD", "#03B4CC", "#A65628", "#FF7F00", "#984EA3", "#4DAF4A", "#CCCC00")[c(1,2,4,5,3,6,7)]
+pcolshex <- c("#0000CD","#03B4CC","#FF7F00","#984EA3","#FF69B4","#A65628","#4DAF4A","#CCCC00")
 ancreg_list <- c("Western_Africa_Niger-Congo","Central_West_Africa_Niger-Congo",
-                 "East_Africa_Niger-Congo","East_Africa_Nilo-Saharan",
+                 "East_Africa_Niger-Congo","East_Africa_Nilo-Saharan","East_Africa_Afro-Asiatic",
                  "South_Africa_Niger-Congo","South_Africa_KhoeSan","Eurasia" )
 
 ###########################################################

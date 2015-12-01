@@ -14,6 +14,7 @@ library("xtable")
        
 ###########################################################
 ## DEFINE VARIABLES AND FILES
+setwd(paste0(main_dir,"popgen/"))
 popkey_file <- "data/MalariaGenAdmixturePopulationOverview.txt"
 popkey <- read.table(popkey_file,header=T)
 popkey$Ethnic_Group <- toupper(popkey$Ethnic_Group)
@@ -212,7 +213,7 @@ colnames(finaltable) <- c("Cluster","Analysis","Result","Date","alpha",
 ## LOOK AT DATE BOOTSTRAPS AND GENERATE CONFIDENCE INTERVALS
 dateboots2 <- c()
 dateboots3 <- c()
-for(i in levels(dateboots$pop))
+for(i in unique(dateboots$pop))
 {
     ii <- sapply(quantile(dateboots$date1.est.boot[dateboots$pop==i],c(0.975,0.025)),makeDate)
     dateboots2 <- rbind(dateboots2,c(i,ii))
@@ -223,7 +224,7 @@ for(i in levels(dateboots$pop))
 ## LOOK AT TWO DATE BOOTSTRAPS AND GENERATE CONFIDENCE INTERVALS
 date2boots2 <- c()
 date2boots3 <- c()
-for(i in levels(date2boots$pop))
+for(i in unique(date2boots$pop))
 {
     ii <- sapply(quantile(date2boots$date1.est.boot[date2boots$pop==i],c(0.975,0.025)),makeDate)
     iii <- sapply(quantile(date2boots$date2.est.boot[date2boots$pop==i],c(0.975,0.025)),makeDate)
@@ -316,14 +317,14 @@ res.tabA[,"pval"] <- round(as.numeric(as.character(res.tabA[,"pval"])),2)
 #############################################################
 ## SWITCH RESULT IF MULTIPLE DATE ARE UNREASONABLE ie CI IS LESS THAN 2
 res.tabA$FinalResult <- res.tabA$Result
-min_gens <- 2
+min_gens <- 1
 ## for multiple dates, if either the point estimate or CI include 3
 ## don't bother with nulls
 ## then switch result
 test <- res.tabA$Result=="2D"
 tmp.res <- res.tabA[test==T,]
 tmp.res <- tmp.res[grep("null",tmp.res$Analysis,invert=T),]
-test <- (tmp.res$date2aL>min_gens)
+test <- (as.numeric(tmp.res$date2aL)>min_gens)
 test[is.na(test)] <- F
 tmp.res <- tmp.res[test==F,]
 if(nrow(tmp.res)>0)

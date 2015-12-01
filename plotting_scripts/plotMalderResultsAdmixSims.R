@@ -60,9 +60,12 @@ sim_src2 <- sapply(sim_srcs,function(x) as.character(unlist(src1list[x])[2]))
 sim_tab <- data.frame(cbind(sim_srcs,sim_src1,sim_src2,sim_gens,sim_props))
 sim_tab$sim_src1 <- factor(sim_tab$sim_src1,levels=c("JOLA","MALAWI","JUHOAN"))
 sim_tab$sim_src2 <- factor(sim_tab$sim_src2,levels=c("CEU","JOLA","MALAWI","JUHOAN"))
-sim_pops <- sim_pops[order(sim_tab$sim_src2,sim_tab$sim_src2)]
+sim_tab <- sim_tab[order(sim_tab$sim_src2,sim_tab$sim_src2),]
+sim_pops <- rownames(sim_tab)
+## PLOT JUST THE CEU AND JUHOAN MINOR SOURCES SIMS
+sim_pops <- rownames(sim_tab[sim_tab$sim_src2%in%c("CEU","JUHOAN"),])
 
-## DO THE DIFFERENT MAPS INFER THE SAME NUMBER OF EVENTS? ##
+## DEFINE THE POPULATIONS WE WANT TO PLOT
 pop_vec <- sim_pops #unique(malder_plot$EthnicGroup)
 n_pops <- length(pop_vec)
 
@@ -74,7 +77,7 @@ for(analy in analys)
     sim_dates <- c()
     ##################################################################
     ## PLOT DATES AND COMPARISONS
-    pdf(paste0("figures/AllPopsMalderTimesMapComps",analy,"AdmixSims.pdf"),height=12,width=9)
+    pdf(paste0("figures/AllPopsMalderTimesMapComps",analy,"AdmixSimsCEUJUHOAN.pdf"),height=12,width=9)
         layout(matrix(c(1,1,1,2,3,4),3,2),widths=c(6,3)) #,widths=c(6,3))
         par(mar=c(4,6,3,1))
         x_labs3 <- c(2000,0,-2000,-5000,-10000,-15000)
@@ -109,11 +112,13 @@ for(analy in analys)
         lines(x=c(3200,3200),y=c(0,n_pops+1),lwd=1,xpd=T)
         lines(x=c(4000,4000),y=c(0,n_pops+1),lwd=2,xpd=T)
         
+#        letter_pos <- -5
+        letter_pos <- -3
         text(y=-1,x=5000,labels="SIM PROPS",xpd=T,srt=35,adj=0,cex=1)
         text(y=-1,x=4400,labels="SIM SRCS",xpd=T,srt=35,adj=0,cex=1)
         text(y=-1,x=3600,labels="1ST EVENT",xpd=T,srt=35,adj=0,cex=1)
         text(y=-1,x=2800,labels="2ND EVENT",xpd=T,srt=35,adj=0,cex=1)
-        text(y=-5,x=5000,labels=LETTERS[1],adj=0,las=1,cex=2,lwd=3,xpd=T)
+        text(y=letter_pos,x=5000,labels=LETTERS[1],adj=0,las=1,cex=2,lwd=3,xpd=T)
         ## NOW PLOT DATES AND ANCESTRIES ##
         
         trupropa <- 5200
@@ -125,7 +130,9 @@ for(analy in analys)
         ev1posb <- 3400
         ev2posa <- 3000
         ev2posb <- 2600
-        evcex <- 1.4
+        evcex <- 2
+        datecex <- 2
+        trupropcex <- 1
 
         for(i in (1:length(pop_vec)))
         {
@@ -146,7 +153,7 @@ for(analy in analys)
             points(truposb,i,pch=15,col=pcol2,xpd=T,cex=evcex)
             
             ## PLOT TRUE PROPS
-            points(trupropa,i,pch=15,col="black",xpd=T,cex=1)
+            points(trupropa,i,pch=15,col="black",xpd=T,cex=trupropcex)
             if(sprops %in% c(90,95)) points(trupropb,i,pch=15,col="black",xpd=T,cex=1)
             if(sprops %in% c(95)) points(trupropc,i,pch=15,col="black",xpd=T,cex=1)
             
@@ -178,7 +185,7 @@ for(analy in analys)
                         
                         ## PLOT DATE
                         ## plot true date
-                        points(makeDate(sgens,add_BCE=F),i,pch=21,bg="red", col="red", cex=1)
+                        points(makeDate(sgens,add_BCE=F),i,pch=21,bg="red", col="red", cex=datecex)
                         
                         arrows(makeDate(date-dateci,add_BCE=F),i,
                                makeDate(date+dateci,add_BCE=F),i,
@@ -188,7 +195,7 @@ for(analy in analys)
                         pnt_bg <- "black"
                         if(mainancp>0.001) pnt_bg <- "grey"
                         if(mainancp>0.05) pnt_bg <- "white"
-                        points(makeDate(date,add_BCE=F),i,pch=21,bg=pnt_bg, cex=1.2)
+                        points(makeDate(date,add_BCE=F),i,pch=21,bg=pnt_bg, cex=datecex)
                         
                         sim_dates <- rbind(sim_dates,
                                            c(src1,src2,sgens,sprops,
@@ -258,7 +265,7 @@ for(analy in analys)
         xs <- sapply(as.numeric(as.character(sim_dates$true.date)),makeDate,add_BCE=F) 
         ys <- sapply(as.numeric(as.character(sim_dates$sim.date)),makeDate,add_BCE=F)
 
-        par(mar=c(6,5,2,1))
+        par(mar=c(6,5,3,1))
         plot(xs,ys,xlab="",ylab="",
              pch=20,xlim=c(2000,-12000),ylim=c(-12000,2000),
              axes=F,type="n")
@@ -284,6 +291,11 @@ for(analy in analys)
         y_at_labs <- c("2000\nCE","0","2000\nBCE","5000\nBCE","10000\nBCE")
         axis(2,line=0.5,at=y_at,labels=y_at_labs,las=2,hadj=0.5,padj=0.5,lwd=0)
         abline(h=y_at,lty=2)
+        abline(v=y_at,lty=2)
+        for(i in 2:length(y_at))
+        {
+            text(y=2750,x=y_at[i],labels=y_at_labs[i],xpd=T,srt=45,adj=c(0,0),cex=1)
+        }
         abline(a=0,b=1,col="red",lwd=2)
         box()
         

@@ -11,7 +11,7 @@ library(xtable)
 setwd(paste0(main_dir,"popgen/"))
 ###########################################################
 ## DEFINE DATAFILES
-popkey_file <- "data/MalariaGenAdmixturePopulationOverview.txt"
+popkey_file <- "data/MalariaGenAdmixturePopulationOverviewNSAA.txt"
 
 ## LOAD POPKEY FILE ##
 popkey <- read.table(popkey_file,header=T,as.is=T)
@@ -31,16 +31,15 @@ malder_file <- "~/R/Copy/Rprojects/AfricaPOPGEN/manuscript/f3tables/AllPopsMalde
 malder_plot <- read.table(malder_file,header=T, as.is=T)
 leginfo_file <- "data/MalariaGenAdmixturePopulationKey.txt"
 leginfo <- read.table(leginfo_file,header=T,comment.char="", as.is = T)
-popkey_file <- "data/MalariaGenAdmixturePopulationOverview.txt"
+popkey_file <- "data/MalariaGenAdmixturePopulationOverviewNSAA.txt"
 popkey <- read.table(popkey_file,header=T,as.is=T)
 popkey$Ethnic_Group <- toupper(popkey$Ethnic_Group)
 
 ### DEFINE COLOURS ##
-pcolshex <- c("#0000CD", "#03B4CC", "#A65628", "#FF7F00", "#984EA3", "#4DAF4A", "#CCCC00")[c(1,2,4,5,3,6,7)]
+pcolshex <- c("#0000CD","#03B4CC","#FF7F00","#984EA3","#FF69B4","#A65628","#4DAF4A","#CCCC00")
 ancreg_list <- c("Western_Africa_Niger-Congo","Central_West_Africa_Niger-Congo",
-                 "East_Africa_Niger-Congo","East_Africa_Nilo-Saharan",
+                 "East_Africa_Niger-Congo","East_Africa_Nilo-Saharan","East_Africa_Afro-Asiatic",
                  "South_Africa_Niger-Congo","South_Africa_KhoeSan","Eurasia" )
-
 
 ###################################################################
 ## DO THE DIFFERENT MAPS INFER THE SAME NUMBER OF EVENTS? ##
@@ -172,22 +171,23 @@ for(analy in c("HAPMAP","AfrMap","CeuMap"))
         }
     
         ## PLOT LEGEND 
-        par(mar=c(1,1.5,3,0))
+        par(mar=c(1,1.5,2,0))
         plot(0,0,axes=F,xlab="",ylab="",type="n")
         legend_text <- c("West African Niger-Congo",
                          "Central West African Niger-Congo",
                          "East African Niger-Congo",
                          "South African Niger-Congo",
-                         "Nilo-Saharan / Afro-Asiatic",
+                         "East African Nilo-Saharan",
+                         "East African Afro-Asiatic",
                          "KhoeSan",
                          "Eurasia",
                          "main event ancestry",
                          "high confidence date (P<0.001)",
                          "low confidence date (P<0.05)",
                          "non-significant date (P>0.05)")
-        l <- legend("top",legend=legend_text,pch=c(rep(15,7),22,21,21,21),
-                    col=c(pcolshex[c(1:3,5,4,6,7)],"black","black","black","black"),bty="n",
-                    pt.bg=c(pcolshex[c(1:3,5,4,6,7)],"white","black","grey","white"),
+        l <- legend("top",legend=legend_text,pch=c(rep(15,8),22,21,21,21),
+                    col=c(pcolshex[c(1:3,6,4,5,7,8)],"black","black","black","black"),bty="n",
+                    pt.bg=c(pcolshex[c(1:3,6,4,5,7,8)],"white","black","grey","white"),
                     ncol=1,xpd=T,pt.cex=3,x.intersp=1,y.intersp=1.25,
                     pt.lwd=2,cex=1.25, title="Ancestry Region")
         par(mar=c(5,5,2,1))

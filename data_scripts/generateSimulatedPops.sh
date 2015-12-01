@@ -124,6 +124,15 @@ for pop1 in ${pops[@]} ; do
         pop2=$(echo $i | sed 's/'${pop1}'//' | sed 's/[0-9]//g' | sed 's/gp//' )
         sed -i '/^'${pop2}'/ d' ${analydir}/${i}nolocal.pops
         echo "$i R" >> ${analydir}/${i}nolocal.pops
+        ## now also make a local pops file
+        awk '{print $1,"D"}' ${analydir}/AllMalariaGEN.pops > ${analydir}/${i}.pops
+        ## remove pop1 from being a donor
+        sed -i '/^'${pop1}'/ d' ${analydir}/${i}.pops
+        ## remove the minor pop from being a donor
+        pop2=$(echo $i | sed 's/'${pop1}'//' | sed 's/[0-9]//g' | sed 's/gp//' )
+        sed -i '/^'${pop2}'/ d' ${analydir}/${i}.pops 
+        ## add the simpop name as a recipient
+        echo "$i R" >> ${analydir}/${i}.pops
     done
 done
 
@@ -218,7 +227,7 @@ done
 
 
 
-## GENERATE GLOBETROTTER PARAMFILES
+## GENERATE NO-LOCAL GLOBETROTTER PARAMFILES
 pops=(MALAWI JOLA JUHOAN CEU)
 gens=(100 200 300 400)
 props=(95 90 80)
@@ -257,8 +266,79 @@ for pop1 in ${pops[@]} ; do
 done
 
 
-## GENERATE GLOBETROTTER RUNSCRIPTS
+## GENERATE GLOBETROTTER PARAMFILES: THIS TIME WITH INCLUDING ALL POPS AS SURROGATES,EXCEPT
+## THE TWO USED TO SIMULATE ADMIXTURE 
+pops=(MALAWI JOLA JUHOAN CEU)
+gens=(100 200 300 400)
+props=(95 90 80)
+temp_param=/well/malariagen/malariagen/human/george/admix_sims/globetrotter/paramfiles/TEMP.paramfile.ancient.txt
+for pop1 in ${pops[@]} ; do
+    for pop2 in ${pops[@]} ; do
+        for gen in ${gens[@]} ; do
+            for prop in ${props[@]} ; do
+                if [[ $pop1 != $pop2 && $pop1 != 'CEU' ]] ; then
+                    param_file=/well/malariagen/malariagen/human/george/admix_sims/globetrotter/paramfiles/${pop1}${pop2}${gen}g${prop}p.paramfileII.ancient.txt
+                    run_temp=/well/malariagen/malariagen/human/george/admix_sims/globetrotter/scripts/globetrotterIITEMPLATE.sh
+                    cvpops=$(awk '{if ($2 == "D") printf("%s ", $1)}' /well/malariagen/malariagen/human/george/admix_sims/chromopainter/analysislists/${pop1}${pop2}${gen}g${prop}pnolocal.pops) 
+                    surpops=$(awk '{print $1}' /well/malariagen/malariagen/human/george/admix_sims/chromopainter/analysislists/AllMalariaGEN.pops | sort | uniq | grep -wv $pop1 | grep -wv $pop2 | tr '\n' ' ')
+                    sed -e 's/TEMPPOP1/'${pop1}'/g' \
+                        -e 's/TEMPPOP2/'${pop2}'/g' \
+                        -e 's/TEMPANALY/'${gen}g${prop}p'/g' \
+                        -e 's/idfile/idfileII/g' \
+                        -e "s/TEMPCVPOPS/${cvpops}/g" \
+                        -e "s/TEMPSURPOPS/${surpops}/g" \
+                        $temp_param > $param_file
+                        
+                    run_file=/well/malariagen/malariagen/human/george/admix_sims/globetrotter/scripts/run/${pop1}${pop2}${gen}g${prop}p.propsII.anc.sh
+                    sed -e 's/TEMPPOP1/'${pop1}'/g' \
+                        -e 's/TEMPPOP2/'${pop2}'/g' \
+                        -e 's/TEMPANALY/'${gen}g${prop}p'/g' \
+                        $run_temp > $run_file
+                fi
+            done
+       done
+   done
+done
 
+## GENERATE GLOBETROTTER DATE PARAMFILES: THIS TIME WITH INCLUDING ALL POPS AS SURROGATES,EXCEPT
+## THE TWO USED TO SIMULATE ADMIXTURE 
+pops=(MALAWI JOLA JUHOAN CEU)
+gens=(100 200 300 400)
+props=(95 90 80)
+param=ancient.dates
+temp_param=/well/malariagen/malariagen/human/george/admix_sims/globetrotter/paramfiles/TEMP.paramfile.${param}.txt
+for pop1 in ${pops[@]} ; do
+    for pop2 in ${pops[@]} ; do
+        for gen in ${gens[@]} ; do
+            for prop in ${props[@]} ; do
+                if [[ $pop1 != $pop2 && $pop1 != 'CEU' ]] ; then
+                    for bt in $(seq 0 19); do
+                        param_file=/well/malariagen/malariagen/human/george/admix_sims/globetrotter/paramfiles/${pop1}${pop2}${gen}g${prop}p.paramfileII.${param}.bt${bt}.txt
+                        run_temp=/well/malariagen/malariagen/human/george/admix_sims/globetrotter/scripts/globetrotterIIdatesTEMPLATE.sh
+                        cvpops=$(awk '{if ($2 == "D") printf("%s ", $1)}' /well/malariagen/malariagen/human/george/admix_sims/chromopainter/analysislists/${pop1}${pop2}${gen}g${prop}pnolocal.pops) 
+                        surpops=$(awk '{print $1}' /well/malariagen/malariagen/human/george/admix_sims/chromopainter/analysislists/AllMalariaGEN.pops | sort | uniq | grep -wv $pop1 | grep -wv $pop2 | tr '\n' ' ')
+                        sed -e 's/TEMPPOP1/'${pop1}'/g' \
+                            -e 's/TEMPPOP2/'${pop2}'/g' \
+                            -e 's/TEMPANALY/'${gen}g${prop}p'/g' \
+                            -e 's/idfile/idfileII/g' \
+                            -e "s/TEMPCVPOPS/${cvpops}/g" \
+                            -e "s/TEMPSURPOPS/${surpops}/g" \
+                            -e 's/TEMPBOOT/'${bt}'/g' \
+                            $temp_param > $param_file
+                            
+                        run_file=/well/malariagen/malariagen/human/george/admix_sims/globetrotter/scripts/run/${pop1}${pop2}${gen}g${prop}p.${param}.${bt}.sh
+                        sed -e 's/TEMPPOP1/'${pop1}'/g' \
+                            -e 's/TEMPPOP2/'${pop2}'/g' \
+                            -e 's/TEMPANALY/'${gen}g${prop}p'/g' \
+                            -e 's/TEMPPARAM/'${param}'/g' \
+                            -e 's/TEMPBOOT/'${bt}'/g' \
+                            $run_temp > $run_file
+                    done
+                fi
+            done
+       done
+   done
+done
 
 
 
