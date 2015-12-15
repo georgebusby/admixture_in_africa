@@ -17,6 +17,12 @@ tree_labels <- gsub("/GUI//GHANA","/GUI//GHANA_KGAL",tree_labels)
 tree_labels <- getPopSymbols(tree_labels,leginfo)
 
 tree2plot <- ttree
+tree2plot <- as.phylo(tree2plot)
+###########################################################
+## ROTATE SOME OF THE NODES
+#tree2plot <- reorder.phylo(rotate(tree2plot,c("JOLA_S1","YORUBA2")))
+#tree2plot <- rotate(tree2plot,2211)
+
 if(plot_tree_labels == TRUE)
 {
     tree2plot$tip.label <- tree_labels$pop_vec
@@ -24,8 +30,9 @@ if(plot_tree_labels == TRUE)
 {
     tree2plot$tip.label <- rep("",length(tree_labels$pop_vec)) 
 }
-tree2plot <- as.phylo(tree2plot)
 
+
+###########################################################
 edge_cols <- c()
 for(i in 1:nrow(tree2plot$edge))
 {

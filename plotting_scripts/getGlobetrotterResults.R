@@ -215,9 +215,10 @@ dateboots2 <- c()
 dateboots3 <- c()
 for(i in unique(dateboots$pop))
 {
-    ii <- sapply(quantile(dateboots$date1.est.boot[dateboots$pop==i],c(0.975,0.025)),makeDate)
+    ds <- round(dateboots$date1.est.boot[dateboots$pop==i & dateboots[,2] == "main"])
+    ii <- sapply(quantile(ds,c(0.975,0.025)),makeDate)
     dateboots2 <- rbind(dateboots2,c(i,ii))
-    ii <- round(quantile(dateboots$date1.est.boot[dateboots$pop==i],c(0.025,0.975)))
+    ii <- round(quantile(ds,c(0.025,0.975)))
     dateboots3 <- rbind(dateboots3,c(i,ii))
 }
 #############################################################
@@ -226,11 +227,13 @@ date2boots2 <- c()
 date2boots3 <- c()
 for(i in unique(date2boots$pop))
 {
-    ii <- sapply(quantile(date2boots$date1.est.boot[date2boots$pop==i],c(0.975,0.025)),makeDate)
-    iii <- sapply(quantile(date2boots$date2.est.boot[date2boots$pop==i],c(0.975,0.025)),makeDate)
+    ds1 <- round(date2boots$date1.est.boot[date2boots$pop==i])
+    ds2 <- round(date2boots$date2.est.boot[date2boots$pop==i])
+    ii <- sapply(quantile(ds1,c(0.975,0.025)),makeDate)
+    iii <- sapply(quantile(ds2,c(0.975,0.025)),makeDate)
     date2boots2 <- rbind(date2boots2,c(i,ii,iii))
-    ii <- round(quantile(date2boots$date1.est.boot[date2boots$pop==i],c(0.025,0.975)))
-    iii <- round(quantile(date2boots$date2.est.boot[date2boots$pop==i],c(0.025,0.975)))
+    ii <- round(quantile(ds1,c(0.025,0.975)))
+    iii <- round(quantile(ds2,c(0.025,0.975)))
     date2boots3 <- rbind(date2boots3,c(i,ii,iii))
 }
 
@@ -317,7 +320,7 @@ res.tabA[,"pval"] <- round(as.numeric(as.character(res.tabA[,"pval"])),2)
 #############################################################
 ## SWITCH RESULT IF MULTIPLE DATE ARE UNREASONABLE ie CI IS LESS THAN 2
 res.tabA$FinalResult <- res.tabA$Result
-min_gens <- 1
+min_gens <- 0
 ## for multiple dates, if either the point estimate or CI include 3
 ## don't bother with nulls
 ## then switch result
@@ -381,7 +384,7 @@ res.tabB <- res.tabB[,colnames(res.tabB)!="FinalResult"]
 
 for(i in c("date.1D","date.2D.1","date.2D.2"))
 {
-    res.tabB[,i] <- sapply(res.tabB[,i],function(x)makeDate(as.numeric(x),add_BCE=F))
+    res.tabB[,i] <- sapply(res.tabB[,i],function(x)makeDate(round(as.numeric(x)),add_BCE=F))
     res.tabB[,i][which(res.tabB[,i]<0)] <- paste0(-res.tabB[,i][which(res.tabB[,i]<0)],"B")
     res.tabB[,i] <- as.character(res.tabB[,i])
 }
@@ -408,10 +411,24 @@ write.table(admixturesources4,paste0(main_dir,"popgen/data/MalariaGenGlobetrotte
 write.table(dateboots,paste0(main_dir,"popgen/data/MalariaGenGlobetrotterOneDateBootstraps.txt"))
 write.table(date2boots,paste0(main_dir,"popgen/data/MalariaGenGlobetrotterTwoDateBootstraps.txt"))
 
+## combine the date CI colummns
+res.tabB <- final.res2plot
+res.tabB$date.1D <- gsub("NAnewlineNA",NA,paste(res.tabB$date.1D,res.tabB$Date.CI,sep="newline"))
+res.tabB$date.2D.1 <- gsub("NAnewlineNA",NA,paste(res.tabB$date.2D.1,res.tabB$Date2a.CI,sep="newline"))
+res.tabB$date.2D.2 <- gsub("NAnewlineNA",NA,paste(res.tabB$date.2D.2,res.tabB$Date2b.CI,sep="newline"))
+res.tabB <- res.tabB[,!colnames(res.tabB)%in%c("Date.CI","Date2a.CI","Date2b.CI")]
+
+## put in proper names
+namecols <- c("Cluster",grep("source",colnames(res.tabB),value=T))
+for(i in namecols)
+{
+    tmp <- tidyNames(res.tabB[,i], fula=F)
+    res.tabB[,i] <- tmp
+}
 #############################################################
-res.tabB <- xtable(res.tabB,align="|r|r|ccccccccccccccccccccccccc|")
+res.tabB <- xtable(res.tabB,align="|r|r|cccccccccccccccccccccc|")
 newlines <- c()
-newlineord <- res.tabB$best.source1
+newlineord <- as.character(res.tabB$best.source1)
 newlineord[is.na(newlineord)] <- res.tabB$best.source1.ev2[is.na(newlineord)]
 newlineord[is.na(newlineord)] <- res.tabB$best.source1.date1[is.na(newlineord)]
 for(i in (2:length(newlineord))) if(newlineord[i]!=newlineord[(i-1)]) newlines <- c(newlines,i)
@@ -431,6 +448,7 @@ print(res.tabB, floating=FALSE,
       caption.placement="top",file=paste0(main_dir,"popgen/figures/AfricaGTBESTtable.tex"),
       booktabs=TRUE,add.to.row=addtorow)#,
 
+#system(paste0("sed -i 's|newline|\newline|g' ",main_dir,"popgen/figures/AfricaGTBESTtable.tex"))
 
 #############################################################
 ## FINALLY RECORD ALL RESULTS
@@ -445,12 +463,29 @@ res.tabA <- res.tabA[,colnames(res.tabA)!="FinalResult"]
 
 for(i in c("date.1D","date.2D.1","date.2D.2"))
 {
-    res.tabA[,i] <- sapply(res.tabA[,i],function(x)makeDate(as.numeric(x),add_BCE=F))
+    res.tabA[,i] <- sapply(res.tabA[,i],function(x)makeDate(round(as.numeric(x)),add_BCE=F))
     res.tabA[,i][which(res.tabA[,i]<0)] <- paste0(-res.tabA[,i][which(res.tabA[,i]<0)],"B")
     res.tabA[,i] <- as.character(res.tabA[,i])
 }
 res.tabA$pval[res.tabA$pval==0] <- "<0.01"
-res.tabA <- xtable(res.tabA,align="|r|r|ccccccccccccccccccccccccc|")
+
+tmp <- res.tabA
+## combine the date CI colummns
+res.tabA$date.1D <- gsub("NAnewlineNA",NA,paste(res.tabA$date.1D,res.tabA$Date.CI,sep="newline"))
+res.tabA$date.2D.1 <- gsub("NAnewlineNA",NA,paste(res.tabA$date.2D.1,res.tabA$Date2a.CI,sep="newline"))
+res.tabA$date.2D.2 <- gsub("NAnewlineNA",NA,paste(res.tabA$date.2D.2,res.tabA$Date2b.CI,sep="newline"))
+res.tabA <- res.tabA[,!colnames(res.tabA)%in%c("Date.CI","Date2a.CI","Date2b.CI")]
+
+## put in proper names
+namecols <- c("Cluster",grep("source",colnames(res.tabA),value=T))
+for(i in namecols)
+{
+    tmp <- tidyNames(res.tabA[,i], fula=F)
+    res.tabA[,i] <- tmp
+}
+
+
+res.tabA <- xtable(res.tabA,align="|r|r|cccccccccccccccccccccc|")
 
 ### print all events
 newlines <- c()

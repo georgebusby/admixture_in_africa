@@ -64,6 +64,8 @@ if(plot_equator==T)
 
 box()
 
+legend("bottomright",legend="A",cex=2,bty="n")
+
 ## PLOT POINTS, ALLOWING FOR MULTIPLE POPS FROM THE SAME COUNTRY
 newi <- plotPopPoints(latlong_file,leginfo_file,poppos_file,pt_cex=2)
 
@@ -107,12 +109,12 @@ if(plot_legends == TRUE)
         par(mar=c(0,0,0,0))
         plot(0,0,type="n",axes=F,xlab="",ylab="")
         legend("topleft",ncol=1,
-               legend=c(gsub("\\_","\n",paste0(as.character(leginfo$EthnicGroup),
-                                               " [",as.character(leginfo$pop_nums),"]")),"\n"),
+               legend=c(paste0(tidyNames(as.character(leginfo$EthnicGroup),khoesan=T),
+                                               " [",as.character(leginfo$pop_nums),"]")),
                pch=as.numeric(leginfo$poppch),
                pt.bg=as.character(leginfo$Colour),
                pt.cex=c(rep(pt_cex,length(leginfo$poppch)),0),
-               pt.lwd=0.5,y.intersp = 0.9,
+               pt.lwd=0.5,y.intersp = 1.5,
                col=legrim,cex=0.75,
                text.col=as.character(leginfo$Colour),xpd=T,
                bty="n",

@@ -27,10 +27,10 @@ popkey$Ethnic_Group <- toupper(popkey$Ethnic_Group)
 
 pdf("figures/Figure1new.pdf",width=10,height=5)
     par(mar=c(0.5,0.5,0.5,0.5))
-    layout(matrix(c(1,2,3,4,12,10,
+    layout(matrix(c(1,2,3,4,11,10,
                     1,2,3,4,7,8,
                     5,6,6,6,7,8,
-                    5,6,6,6,11,9),4,6,byrow=T),
+                    5,6,6,6,12,9),4,6,byrow=T),
            width=c(2.5,rep((2.5/3),3),1,4),
            height=c(1,1.5,2,0.5))
     ###########################################################
@@ -44,8 +44,8 @@ pdf("figures/Figure1new.pdf",width=10,height=5)
     pcolshex <- c("#0000CD", "#03B4CC", "#A65628", "#FF7F00", "#984EA3", "#4DAF4A", "#CCCC00") ## colours
     map_ocean_col <- "paleturquoise1" ## colour of ocean in map
     map_miss_col <- "white" ## colour of non-focal countries in map
-    pt_cex <- 1
-    pt_lwd <- 0.5
+    pt_cex <- 2
+    pt_lwd <- 0.75
     plot_legends <- TRUE
     source("plotting_scripts/africamap.R")
     ###########################################################
@@ -54,6 +54,7 @@ pdf("figures/Figure1new.pdf",width=10,height=5)
     yplot <- 1 ## y-axis pc to plot
     revX <- T ## should x-axis be reversed
     revY <- T ## should y-axis be reversed
+    panel_letter <- "B"
     par(mar=c(0.5,0.5,0.5,0.5))
     source("plotting_scripts/africapca.R")
     ###########################################################
@@ -62,15 +63,23 @@ pdf("figures/Figure1new.pdf",width=10,height=5)
     yplot <- 1 ## y-axis pc to plot
     revX <- T ## should x-axis be reversed
     revY <- T ## should y-axis be reversed
+    panel_letter <- "C"
     source("plotting_scripts/africapca.R")
     ###########################################################
     ## 03 FS TREE
     plot_vert <- TRUE
     plot_tree_labels <- FALSE
-    rect_splits <- c(0,12,237,910,1176,1895,2198)
-    rect_cols <- c("#CCCC00","#32CD32","#FF7F00","#8B0A50","#0000CD","#03B4CC")
-    rect_labels <- c("","SOUTH_AFRICA_[KS / NC]","EAST_AFRICA_[NC]","EAST_AFRICA_[AA / NS]",
+#     rect_splits <- c(0,12,237,910,1176,1895,2198)
+#     rect_cols <- c("#CCCC00","#32CD32","#FF7F00","#8B0A50","#0000CD","#03B4CC")
+#     rect_labels <- c("","SOUTH_AFRICA_[KS / NC]","EAST_AFRICA_[NC]","EAST_AFRICA_[AA / NS]",
+#                      "WEST_AFRICA_[NC]","CENTRAL_WEST_AFRICA_[NC]")
+    ## THIS IS FOR ALL EIGHT ANCESTRY REGIONS    
+    rect_splits <- c(0,12,195,339,910,1080,1176,1895,2198)
+    rect_cols <- c("#CCCC00","#32CD32","#A65628","#FF7F00","#FF69B4","#984EA3","#0000CD","#03B4CC")
+    rect_labels <- c("","SOUTH_AFRICA_[KS]","SOUTH_AFRICA_[NC]",
+                     "EAST_AFRICA_[NC]","EAST AFRICA_[AA]","EAST AFRICA_[NS]",
                      "WEST_AFRICA_[NC]","CENTRAL_WEST_AFRICA_[NC]")
+
     rect_split_x <- 1250 ## where to make the rectangles more transparent
     par(mar=c(0.5,0.5,0,0))
     source("plotting_scripts/africatree.R")
@@ -86,4 +95,11 @@ pdf("figures/Figure1new.pdf",width=10,height=5)
     plot_vert <- FALSE
     par(mar=c(0,0,1,0.5))
     source("plotting_scripts/africatree.R")
+    ###########################################################
+    ## 06 PLOT PANEL LETTER TOP LEFT ABOVE TREE
+    par(mar=c(0,0,1,0))    
+    plot(0,0,type="n",axes=F,xlab="",ylab="")
+    legend("topleft",legend="D",cex=2,bty="n")
+
+
 dev.off()

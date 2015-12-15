@@ -27,7 +27,7 @@ poplist<- as.matrix(poplist)
 n_pops <- nrow(poplist)
 in_dir <- "/mnt/kwiat/data/bayes/users/george/popgen/analysis3/alder/output/"
 analys <- c("HAPMAP","CeuMap","AfrMap")
-malder_file <- "~/R/Copy/Rprojects/AfricaPOPGEN/manuscript/f3tables/AllPopsMalderFinalALLmindis.txt"
+malder_file <- "~/R/Copy/Rprojects/AfricaPOPGEN/manuscript/f3tables/AllPopsMalderFinalALL.txt"
 malder_plot <- read.table(malder_file,header=T, as.is=T)
 leginfo_file <- "data/MalariaGenAdmixturePopulationKey.txt"
 leginfo <- read.table(leginfo_file,header=T,comment.char="", as.is = T)
@@ -40,6 +40,7 @@ pcolshex <- c("#0000CD","#03B4CC","#FF7F00","#984EA3","#FF69B4","#A65628","#4DAF
 ancreg_list <- c("Western_Africa_Niger-Congo","Central_West_Africa_Niger-Congo",
                  "East_Africa_Niger-Congo","East_Africa_Nilo-Saharan","East_Africa_Afro-Asiatic",
                  "South_Africa_Niger-Congo","South_Africa_KhoeSan","Eurasia" )
+
 
 ###################################################################
 ## DO THE DIFFERENT MAPS INFER THE SAME NUMBER OF EVENTS? ##
@@ -82,12 +83,16 @@ for(analy in c("HAPMAP","AfrMap","CeuMap"))
     
     ##################################################################
     ## PLOT DATES AND MAP COMPARISONS
-    pdf(paste0("figures/AllPopsMalderTimesMapCompsMinDis",analy,".pdf"),height=9,width=9)
-        layout(matrix(c(1,1,1,2,3,4),3,2),widths=c(6,3))
-        par(mar=c(4,16,4,1))
-        x_labs3 <- c(2000,0,-2000,-5000,-10000)
-        comp_ax <- c(0,400)
-        x_labs3char <- c("2000\nCE",0,"2000\nBCE","5000\nBCE","10000\nBCE")
+    pdf(paste0("figures/AllPopsMalderTimesMapComps",analy,".pdf"),height=9,width=9)
+        layout(matrix(c(1,1,1,2,2,2,3,3,3,4,5,6),3,4),widths=c(4,1,1,3))
+        par(mar=c(4,12,4,0.5))
+        
+        comp_ax <- c(0,240)
+        #x_labs3 <- c(2000,0,-2000,-5000,-10000)    
+        #x_labs3char <- c("2000\nCE",0,"2000\nBCE","5000\nBCE","10000\nBCE")
+        x_labs3 <- c(2000,0,-2000,-5000,-7500)
+        x_labs3char <- c("2000\nCE",0,"2000\nBCE","5000\nBCE","7500\nBCE")
+    
         x_max <- min(x_labs3)
         plot(0,0,xlim=rev(range(x_labs3)),
              ylim=c(n_pops,1),type="n",axes=F,xlab="",ylab="")
@@ -106,70 +111,114 @@ for(analy in c("HAPMAP","AfrMap","CeuMap"))
         }
         
         ## SET THE SCENE
-        for(i in 1:n_pops) axis(2,pos=4000,at=i,
-                                labels=tidyNames(pop_vec[i],fula=T),
+        poplabpos <- 4600
+        ev1pos1 <- 4400
+        ev1pos2 <- 3800
+        ev2pos1 <- 3100
+        ev2pos2 <- 2600
+    
+        
+        for(i in 1:n_pops) axis(2,pos=poplabpos,at=i,
+                                labels=tidyNames(pop_vec[i],fula=T,khoesan=T),
                                 col.axis=y_ax_cols[i],las=2,tck=0,lwd=0,line=-0.5)
         
         for(i in seq(0.5,(n_pops+1),1)) abline(h=i,lty=3,lwd=0.5)
-        lines(x=c(3200,3200),y=c(0,n_pops+1),lwd=1,xpd=T)
+        lines(x=rep(median(c(ev2pos1,ev1pos2)),2),y=c(0,n_pops+1),lwd=1,xpd=T)
         
-        text(y=-1,x=3600,labels="1ST EVENT",xpd=T,srt=35,adj=0)
-        text(y=-1,x=2800,labels="2ND EVENT",xpd=T,srt=35,adj=0)
+        text(y=-1,x=median(c(ev1pos1,ev1pos2)),labels="1ST EVENT",xpd=T,srt=35,adj=0)
+        text(y=-1,x=median(c(ev2pos1,ev2pos2)),labels="2ND EVENT",xpd=T,srt=35,adj=0)
         
         ## NOW PLOT DATES AND ANCESTRIES ##
         
-        ev1posa <- 3800
-        ev1posb <- 3400
-        ev2posa <- 3000
-        ev2posb <- 2600
-        
+    
+        onedate_mat <- twodate_mat <- matrix(NA,nr=length(pop_vec),nc=(length(ancreg_list)*2))
+        tpopcols <- c(grep("tpop1",colnames(tt),value=T)[2:9],
+                      grep("tpop2",colnames(tt),value=T)[2:9])
+        colnames(onedate_mat) <- colnames(twodate_mat) <- tpopcols
         for(i in (1:length(pop_vec)))
         {
             pop1 <- as.character(pop_vec)[i]
             tt <- malder[malder$EthnicGroup==pop1,]
             tt <- tt[order(tt$Date.Gens),]
             res_tmp <- nrow(tt)
-            if(nrow(tt)>0 & tt$Date.Gens>0)
+            if(nrow(tt)>0)
             {
-                for(j in 1:nrow(tt))
+                if(tt$Date.Gens>0)
                 {
-                    date <- tt$Date.Gens[j]
-                    dateci <- tt$Date.Gens.CI[j]
-                    donpop1 <- strsplit(tt$Test.Pops[j],split="\\;")[[1]][1]
-                    donanc1 <- getPopRegion(tidyNames(donpop1,fula=T),popkey)
-                    donpop2 <- strsplit(tt$Test.Pops[j],split="\\;")[[1]][2]
-                    donanc2 <- getPopRegion(tidyNames(donpop2,fula=T),popkey)
-                    mainanc <- tt$Main.Anc[j]
-                    mainancp <- tt$Main.Anc.p[j]
-                
-                    ## PLOT DATE
-                    arrows(makeDate(date-dateci,add_BCE=F),i,
-                           makeDate(date+dateci,add_BCE=F),i,
-                           angle=90,length=0.025,code=3)
-                    pcol1 <- pcolshex[ancreg_list==donanc1]
-                    pcol2 <- pcolshex[ancreg_list==donanc2]
-                    pnt_bg <- "black"
-                    if(mainancp>0.001) pnt_bg <- "grey"
-                    if(mainancp>0.05) pnt_bg <- "white"
-                    points(makeDate(date,add_BCE=F),i,pch=21,bg=pnt_bg, cex=2)
-                
-                    ## PLOT EVENT ANCESTRIES
-                    if(j == 1)
+                    for(j in 1:nrow(tt))
                     {
-                        points(ev1posa,i,pch=15,col=pcol1,xpd=T,cex=2)
-                        points(ev1posb,i,pch=15,col=pcol2,xpd=T,cex=2)
-                        if(donanc1 == mainanc) points(ev1posa,i,pch=22,xpd=T,cex=2,lwd=1.5)
-                        if(donanc2 == mainanc) points(ev1posb,i,pch=22,xpd=T,cex=2,lwd=1.5)
-                    }
+                        date <- tt$Date.Gens[j]
+                        dateci <- tt$Date.Gens.CI[j]
+                        donpop1 <- strsplit(tt$Test.Pops[j],split="\\;")[[1]][1]
+                        donanc1 <- tt$tpop1[j]
+                        donpop2 <- strsplit(tt$Test.Pops[j],split="\\;")[[1]][2]
+                        donanc2 <- tt$tpop2[j]
+                        mainanc <- tt$Main.Anc[j]
+                        mainancp <- tt$Main.Anc.p[j]
                     
-                    if(j == 2)
-                    {    points(ev2posa,i,pch=15,col=pcol1,xpd=T,cex=2)
-                         points(ev2posb,i,pch=15,col=pcol2,xpd=T,cex=2)
-                         if(donanc1 == mainanc) points(ev2posa,i,pch=22,xpd=T,cex=2,lwd=1.5)
-                         if(donanc2 == mainanc) points(ev2posb,i,pch=22,xpd=T,cex=2,lwd=1.5)
-                    }     
+                        ## PLOT DATE
+                        arrows(makeDate(date-dateci,add_BCE=F),i,
+                               makeDate(date+dateci,add_BCE=F),i,
+                               angle=90,length=0.025,code=3)
+                        pcol1 <- pcolshex[ancreg_list==donanc1]
+                        pcol2 <- pcolshex[ancreg_list==donanc2]
+                        pnt_bg <- "black"
+                        #if(mainancp>0.001) pnt_bg <- "grey"
+                        #if(mainancp>0.05) pnt_bg <- "white"
+                        points(makeDate(date,add_BCE=F),i,pch=21,bg=pnt_bg, cex=2)
+                    
+                        ## PLOT EVENT ANCESTRIES
+                        if(j == 1)
+                        {
+                            points(ev1pos1,i,pch=15,col=pcol1,xpd=T,cex=2)
+                            points(ev1pos2,i,pch=15,col=pcol2,xpd=T,cex=2)
+                            if(donanc1 == mainanc) points(ev1pos1,i,pch=22,xpd=T,cex=2,lwd=1.5)
+                            if(donanc2 == mainanc) points(ev1pos2,i,pch=22,xpd=T,cex=2,lwd=1.5)
+                            ## ADD VALUES TO ONE-DATE MATRIX
+                            onedate_mat[i,] <- as.numeric(tt[j,tpopcols])
+                        }
+                        
+                        if(j == 2)
+                        {    
+                            points(ev2pos1,i,pch=15,col=pcol1,xpd=T,cex=2)
+                            points(ev2pos2,i,pch=15,col=pcol2,xpd=T,cex=2)
+                            if(donanc1 == mainanc) points(ev2pos1,i,pch=22,xpd=T,cex=2,lwd=1.5)
+                            if(donanc2 == mainanc) points(ev2pos2,i,pch=22,xpd=T,cex=2,lwd=1.5)
+                            ## ADD VALUES TO ONE-DATE MATRIX
+                            twodate_mat[i,] <- as.numeric(tt[j,tpopcols]) 
+                        }     
+                    }
                 }
             }
+            
+        }
+
+        ## PLOT SOME
+        for(mat in c(1,2))
+        {
+            if(mat == 1) tmpmat <- onedate_mat
+            if(mat == 2) tmpmat <- twodate_mat
+            tmpmat[tmpmat>2] <- NA
+            tmpmat[is.na(tmpmat)]  <- "white"
+        
+            for(j in 1:ncol(tmpmat))
+            {
+                tmpmat[tmpmat[,j]!="white",j] <- rep(pcolshex,2)[j]
+            }
+        
+            ## EMPTY PLOT
+            par(mar=c(4,0.1,4,0))
+            plot(0,0,xlim=c(0,ncol(tmpmat)),
+                ylim=c(n_pops,1),type="n",axes=F,xlab="",ylab="")
+            xleft <- rep(1:ncol(tmpmat),each=nrow(tmpmat))    
+            ybottom <- rep(1:nrow(tmpmat), times=ncol(tmpmat))
+            rect(xleft-1, ybottom-0.5, xleft, ybottom+0.5, col=tmpmat,border=NA)
+            abline(v=8,lwd=1,lty=2)
+            if(mat == 2) abline(v=-0.5,xpd=F)
+            text(y=0,x=0*(ncol(tmpmat)/4),labels="SOURCE 1",xpd=T,srt=35,adj=0)
+            text(y=0,x=2*(ncol(tmpmat)/4),labels="SOURCE 2",xpd=T,srt=35,adj=0)
+            if(mat == 1) text(y=-3,x=2*(ncol(tmpmat)/4),labels="1ST EVENT",xpd=T,srt=0,adj=0.5)
+            if(mat == 2) text(y=-3,x=2*(ncol(tmpmat)/4),labels="2ND EVENT",xpd=T,srt=0,adj=0.5)
         }
     
         ## PLOT LEGEND 
@@ -183,25 +232,24 @@ for(analy in c("HAPMAP","AfrMap","CeuMap"))
                          "East African Afroasiatic",
                          "KhoeSan",
                          "Eurasia",
-                         "main event ancestry",
-                         "high confidence date (P<0.001)",
-                         "low confidence date (P<0.05)")
-        l <- legend("top",legend=legend_text,pch=c(rep(15,8),22,21,21),
-                    col=c(pcolshex[c(1:3,6,4,5,7,8)],"black","black","black"),bty="n",
-                    pt.bg=c(pcolshex[c(1:3,6,4,5,7,8)],"white","black","grey"),
+                         "main event ancestry")
+        l <- legend("top",legend=legend_text,pch=c(rep(15,8),22),
+                    col=c(pcolshex[c(1:3,6,4,5,7,8)],"black"),bty="n",
+                    pt.bg=c(pcolshex[c(1:3,6,4,5,7,8)],"white"),
                     ncol=1,xpd=T,pt.cex=3,x.intersp=1,y.intersp=1.25,
                     pt.lwd=2,cex=1.25, title="Ancestry Region")
         par(mar=c(5,5,2,1))
     
         ## PLOT DATE COMPARISONS
         ## USE ONLY THOSE POPULATIONS WHERE THE SAME EVENTS ARE INFERRED IN ALL THREE MAP ANALYSES ##
-        test <- malder_plot$Main.Anc.p<0.05 & malder_plot$Date.Gens>0 & malder_plot$N.evs>0
+        test <- malder_plot$Date.Gens>0 & malder_plot$N.evs>0
         dates2plot <- malder_plot[test,]
         matching_events <- c()
         for(i in unique(dates2plot$EthnicGroup))
         {
             num_runs <- nrow(dates2plot[dates2plot$EthnicGroup==i,])
-            if(num_runs %in% c(3,6))
+            num_ev_run <- unique(dates2plot$N.evs[dates2plot$EthnicGroup==i])
+            if(num_runs %in% c(3,6) & length(num_ev_run) == 1)
             {
                 matching_events <- c(matching_events,i)
             }
@@ -243,8 +291,8 @@ for(analy in c("HAPMAP","AfrMap","CeuMap"))
                  xlim=sapply(comp_ax,function(x)makeDate(x,add_BCE=F)),
                  ylim=sapply(rev(comp_ax),function(x)makeDate(x,add_BCE=F)),
                  yaxt="n",type="n",xaxt="n")
-            xaxis <- c(2000,0,-2000,-4000,-10000)
-            xaxislabs <- c("2000\nCE",0,"2000\nBCE","4000\nBCE","10000\nBCE")
+            xaxis <- c(2000,0,-2000,-5000,-10000)
+            xaxislabs <- c("2000\nCE",0,"2000\nBCE","5000\nBCE","10000\nBCE")
             axis(1,at=xaxis,labels=xaxislabs,tick=F,padj=0.5,line=0)
             axis(2,at=xaxis,labels=xaxislabs,las=2,tick=F,hadj=0.5,line=0.25)
             for(k in xaxis) abline(h=k,lty=2)

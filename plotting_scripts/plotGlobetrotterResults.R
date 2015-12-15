@@ -445,7 +445,13 @@ pdf("figures/GLOBETROTTERresultsAll2D.pdf",height=9,width=9)
 
     ###################################################################
     ### MALDER AND GLOBETROTTER COMPARISONS
-    maldata <- read.table("data/AllPopsMalderFinalHAPMAP.txt",header=T,as.is=T)
+    maldata <- read.table("data/AllPopsMalderFinalALL.txt",header=T,as.is=T)
+    maldata <- maldata[maldata$Rec.Map=="HAPMAP",]
+    maldata$Date.Gens[maldata$N.evs==0] <- 0
+    maldata$Date.Gens.CI[maldata$N.evs==0] <- 0
+    maldata$Date.Gens[maldata$Main.Anc.p>0.05] <- 0
+    maldata$Date.Gens[maldata$Main.Anc.p>0.05] <- 0
+    
     gtdata <- read.csv("data/AfricaGlobetrotterFinalResults.csv",header=T)
     gtdata <- gtdata[grep("null",gtdata$Analysis,invert=T),]
     gtdata$Result[is.na(gtdata$Result)] <- "1D"
@@ -477,7 +483,7 @@ pdf("figures/GLOBETROTTERresultsAll2D.pdf",height=9,width=9)
     {
         maldate <- sort(maldata$Date.Gens[maldata$EthnicGroup==i])
         
-        if(length(maldate)==1)
+        if(length(maldate)==1 & maldate > 0)
         {
             gtdate <- gtdata$date.1D[gtdata$Cluster==i]
             gtdatel <- gtdata$date.1D.L[gtdata$Cluster==i]
@@ -521,7 +527,7 @@ pdf("figures/GLOBETROTTERresultsAll2D.pdf",height=9,width=9)
     plot(sapply(as.numeric(as.character(datecomps$gtdate)),makeDate,add_BCE=F),
          sapply(as.numeric(as.character(datecomps$maldate)),makeDate,add_BCE=F),
          xlim=sapply(c(0,240),makeDate,add_BCE=F),
-         ylim=sapply(c(400,0),makeDate,add_BCE=F),
+         ylim=sapply(c(240,0),makeDate,add_BCE=F),
          ylab="Date inferred by MALDER",xlab="Date inferred by GLOBETROTTER",
          type="n",axes=F,main="")
     abline(a=0,b=1,lwd=2,col="red")
@@ -638,7 +644,7 @@ pdf("figures/GLOBETROTTERresultsAll2D.pdf",height=9,width=9)
     plot(sapply(as.numeric(as.character(datecomps2$gtdate)),makeDate,add_BCE=F),
          sapply(as.numeric(as.character(datecomps2$maldate)),makeDate,add_BCE=F),
          xlim=sapply(c(0,240),makeDate,add_BCE=F),
-         ylim=sapply(c(400,0),makeDate,add_BCE=F),
+         ylim=sapply(c(240,0),makeDate,add_BCE=F),
          ylab="Date inferred by MALDER",xlab="Date inferred by GLOBETROTTER",
          type="n",axes=F,main="")
     abline(a=0,b=1,lwd=2,col="red")
