@@ -9,19 +9,18 @@
 #' @examples
 #' tidyNames("ESOMALI", fula=T)
 
-tidyNames <- function(x,fula=F,pel=F){
+tidyNames <- function(x,fula=F,pel=F,khoesan=F){
   x <- gsub("IBD","",x)
   x <- gsub("CULTIVATOR","",x)
   x <- gsub("BLACKSMITH","",x)
   x <- gsub("ESOMALI","SOMALI",x)
   x <- gsub("JUHOANSI","JUHOAN",x)
-  x <- gsub("JUHOAN","JUHOANSI",x)
+  x <- gsub("JUHOAN","JU/HOANSI",x)
   x <- gsub("XUNV","XUN",x)
   x <- gsub("SEMI.BANTU","SEMI-BANTU",x) 
   x <- gsub("SWBANTU","HERERO",x)
   x <- gsub("KHOMANI","=KHOMANI",x)
   x <- gsub("GUIGHANAKGAL","/GUI//GHANA_KGAL",x)
-  x <- gsub("JUHOANSI","JU/HOANSI",x)
   x <- gsub("LWK","LUHYA",x)
   x <- gsub("MKK","MAASAI",x)
   x <- gsub("YRI","YORUBA",x)
@@ -36,7 +35,14 @@ tidyNames <- function(x,fula=F,pel=F){
     x <- gsub("MANDINKAII","MANDINKA",x)
     x <- gsub("MANDINKAI","MANDINKA",x)
   }
-    
+  
+  if(khoesan == T)
+  {
+      x <- gsub("/GUI//GHANA_KGAL","/GUI//GANA",x)
+      x <- gsub("JU/HOANSI","JU/\'HOANSI",x)
+      x <- gsub("XUN","!XUN",x)
+      x <- gsub("==KHOMANI","=KHOMANI",x)
+  }
   return(x)
 }
 

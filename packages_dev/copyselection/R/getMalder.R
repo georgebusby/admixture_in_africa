@@ -17,15 +17,24 @@ getMalder <- function(file_name, pop1)
     res <- system(paste0("grep ^RESULT ",file_name," | awk '{print $1}' | sort | uniq "),intern=T)
     if(length(res)>0)
     {
-        if(length(res)>1) res <- res[length(res)-1]
-        num_events <- as.numeric(strsplit(res,split="\\_")[[1]][2])
+        if(length(res)>1)
+        {
+            res <- res[length(res)-1]
+            num_events <- as.numeric(strsplit(res,split="\\_")[[1]][2])
+        } else
+        {
+            res <- ""
+            num_events <- 0
+        }
         ## GET DATA
         #if(num_events == 1 ) one_event <- c(one_event,pop1)
         #if(num_events > 2) multi_events <- c(multi_events,pop1)
         print(c(pop1,num_events))
         if(num_events > 2) num_events <- 2
-        if(num_events == 1)
+        if(res == "RESULT_3") res <- "RESULT_2"
+        if(num_events <= 1)
         {
+            res <- "RESULT_1"
             tmp_tab <- system(paste0("grep ",res," ",file_name),intern=T)
             res_tab <- c()
             for(i in 1:length(tmp_tab))
@@ -47,7 +56,7 @@ getMalder <- function(file_name, pop1)
                                     "amp1","amp1.ci","amp1.Z",
                                     "time1","time1.ci","time1.Z")
             
-            res_tab <- cbind(pop1,"one",res_tab[,"refpops"],res_tab2)
+            res_tab <- cbind(pop1,num_events,res_tab[,"refpops"],res_tab2)
             all_res2 <- rbind(all_res2,res_tab)
         }
         if(num_events == 2)
@@ -75,7 +84,7 @@ getMalder <- function(file_name, pop1)
                                     "amp1","amp1.ci","amp1.Z",
                                     "time1","time1.ci","time1.Z")
             
-            res_tab <- cbind(pop1,"multi",res_tab[,"refpops"],res_tab2)
+            res_tab <- cbind(pop1,num_events,res_tab[,"refpops"],res_tab2)
             all_res2 <- rbind(all_res2,res_tab)
         }
         if(num_events == 3)
@@ -107,7 +116,7 @@ getMalder <- function(file_name, pop1)
                                     "amp2","amp2.ci","amp2.Z",
                                     "time2","time2.ci","time2.Z")
             
-            res_tab <- cbind(pop1,"multi",res_tab[,"refpops"],res_tab2)
+            res_tab <- cbind(pop1,num_events,res_tab[,"refpops"],res_tab2)
             all_res2 <- rbind(all_res2,res_tab)
         }
     }

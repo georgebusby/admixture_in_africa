@@ -69,6 +69,7 @@ noprop <- FALSE ## USE ACTUAL PROPORTIONS IN SOURCE BAR CHARTS?
 ## LEAST TO AN EVENT. rev_pops ALLOWS US TO REVERSE WHICH IS THE MAJOR
 ## AND WHICH IS THE MINOR SOURCE IN THE OUTPUT TABLE
 rev_pops <- c("KHWE","AMAXHOSA","SEBANTU","MALAWI")
+#rev_pops <- c()
 pops <- as.character(pltable$Cluster)
 ## I'VE ADDED A FUNCTION TO PULL THESE THINGS OUT
 tempresults <- addGTresults(pltable,rev_pops)
@@ -184,7 +185,7 @@ pdf("figures/GLOBETROTTERresultsAll2D.pdf",height=9,width=9)
 #     topmar <- 8
 #     n_pops <- 12
 
-    par(mar=c(4,14,topmar,0.5))
+    par(mar=c(4,12,topmar,0.5))
     d_pops <- gsub("\\_a","",rownames(all_dates))
     x_labs3 <- c(2000,0,-2000,-5000)
     x_labs3char <- c("2000\nCE",0,"2000\nBCE","5000\nBCE")
@@ -251,16 +252,29 @@ pdf("figures/GLOBETROTTERresultsAll2D.pdf",height=9,width=9)
             #if(pop == "ARI") d <- -d ## not sure why this wasn't reversed before
             if(run == 2) points(d,poppos,pch=20, cex=2)
             #if(run == 2) lines(x=c(dl,dh),y=c(poppos,poppos))
-            if(run == 2) arrows(dl,poppos,dh,poppos,code=3,length=0.025,angle=90)
+            if(run == 2)
+            {
+                if(!is.na(dl) & dl > x_labs3[length(x_labs3)])
+                {
+                    arrows(dl,poppos,dh,poppos,code=3,length=0.025,angle=90)
+                } else
+                {
+                    arrows(dl,poppos,dh,poppos,code=3,length=0.025,angle=90)
+                    dl <- x_labs3[length(x_labs3)]
+                    xrange <- range(x_labs3)[2]-range(x_labs3)[1]
+                    dl <- dl - 0.04*xrange
+                    arrows(dl,poppos,dh,poppos,code=1,length=0.025,angle=45)
+                }
+            }
             if(res %in% c("1D","1MW"))
             {
                 pop2 <- gsub("\\_a","",pop)
                 anc1 <- pltable[pltable$Cluster==pop2,"best.source1"]
                 anc2 <- pltable[pltable$Cluster==pop2,"best.source2"]
-                if(pop2 %in% rev_pops)
+                if(run == 1 & pop2 %in% rev_pops)
                 {
                     addancs <- c(pop,anc2,anc1,d)
-                } else
+                } else if(run == 1)
                 {
                     addancs <- c(pop,anc1,anc2,d)
                 }
@@ -277,15 +291,17 @@ pdf("figures/GLOBETROTTERresultsAll2D.pdf",height=9,width=9)
                 pcol2 <- pcolshex[ancreg_list==as.character(popkey$RegionM[popkey$Ethnic_Group==anc2])]
                 pcol3 <- pcolshex[ancreg_list==as.character(popkey$RegionM[popkey$Ethnic_Group==anc3])]
                 pcol4 <- pcolshex[ancreg_list==as.character(popkey$RegionM[popkey$Ethnic_Group==anc4])]
-                if(run == 2) points(ev1pos1,poppos,pch=15,col=pcol1,xpd=T,cex=2)
-                if(run == 2) points(ev1pos2,poppos,pch=15,col=pcol2,xpd=T,cex=2)
                 if(run == 2)
                 {
                     if(pop%in%rev_pops)
                     {
+                        points(ev1pos1,poppos,pch=15,col=pcol1,xpd=T,cex=2)
+                        points(ev1pos2,poppos,pch=15,col=pcol2,xpd=T,cex=2)
                         points(ev1pos1,poppos,pch=22,xpd=T,cex=2,lwd=1.5)
-                    } else
+                    } else if(length(strsplit(pop, split="\\_")[[1]]) == 1 )
                     {
+                        points(ev1pos1,poppos,pch=15,col=pcol1,xpd=T,cex=2)
+                        points(ev1pos2,poppos,pch=15,col=pcol2,xpd=T,cex=2)
                         points(ev1pos2,poppos,pch=22,xpd=T,cex=2,lwd=1.5)
                     }
                 }
@@ -304,7 +320,7 @@ pdf("figures/GLOBETROTTERresultsAll2D.pdf",height=9,width=9)
                 if(pop2 %in% rev_pops)
                 {
                     addancs <- c(pop,anc2,anc1,d)
-                } else
+                } else if(run == 1)
                 {
                     addancs <- c(pop,anc1,anc2,d)
                 }
@@ -323,19 +339,26 @@ pdf("figures/GLOBETROTTERresultsAll2D.pdf",height=9,width=9)
                 if(run == 2) points(ev1pos1,poppos,pch=15,col=pcol1,xpd=T,cex=2)
                 if(run == 2) points(ev1pos2,poppos,pch=15,col=pcol2,xpd=T,cex=2)
                 if(run == 2)
-                {
-                    if(pop%in%rev_pops)
+                { 
+                    if(pop%in%rev_pops & length(strsplit(pop, split="\\_")[[1]]) != 2)
                     {
+                        points(ev1pos1,poppos,pch=15,col=pcol1,xpd=T,cex=2)
+                        points(ev1pos2,poppos,pch=15,col=pcol2,xpd=T,cex=2)
                         points(ev1pos1,poppos,pch=22,xpd=T,cex=2,lwd=1.5)
-                    } else
+                        points(ev2pos1,poppos,pch=15,col=pcol3,xpd=T,cex=2)
+                        points(ev2pos2,poppos,pch=15,col=pcol4,xpd=T,cex=2)
+                        points(ev2pos2,poppos,pch=22,xpd=T,cex=2,lwd=1.5)
+                    } else if(length(strsplit(pop, split="\\_")[[1]]) != 1)
                     {
+                        points(ev1pos1,poppos,pch=15,col=pcol1,xpd=T,cex=2)
+                        points(ev1pos2,poppos,pch=15,col=pcol2,xpd=T,cex=2)
                         points(ev1pos2,poppos,pch=22,xpd=T,cex=2,lwd=1.5)
+                        points(ev2pos1,poppos,pch=15,col=pcol3,xpd=T,cex=2)
+                        points(ev2pos2,poppos,pch=15,col=pcol4,xpd=T,cex=2)
+                        points(ev2pos2,poppos,pch=22,xpd=T,cex=2,lwd=1.5)
                     }
                 }
                 
-                if(run == 2) points(ev2pos1,poppos,pch=15,col=pcol3,xpd=T,cex=2)
-                if(run == 2) points(ev2pos2,poppos,pch=15,col=pcol4,xpd=T,cex=2)
-                if(run == 2) points(ev2pos2,poppos,pch=22,xpd=T,cex=2,lwd=1.5)
             }
         }
         if(run == 1)
@@ -365,7 +388,8 @@ pdf("figures/GLOBETROTTERresultsAll2D.pdf",height=9,width=9)
     }
     for(i in 1:n_pops)
     {
-        axis(2,pos=poplabpos,at=i,labels=tidyNames(poporder[i],fula=T),col.axis=y_ax_cols[i],las=2,tck=0,lwd=0,line=-0.5)
+        axis(2,pos=poplabpos,at=i,labels=tidyNames(poporder[i],fula=T,khoesan=T),
+             col.axis=y_ax_cols[i],las=2,tck=0,lwd=0,line=-0.5)
     }
     for(i in seq(0.5,(n_pops+1),1)) abline(h=i,lty=3,lwd=0.5)
     lines(x=c(median(c(ev1pos2,ev2pos1)),median(c(ev1pos2,ev2pos1))),y=c(0,n_pops+1),lwd=1,xpd=T)
@@ -433,7 +457,7 @@ pdf("figures/GLOBETROTTERresultsAll2D.pdf",height=9,width=9)
                      "East African Niger-Congo",
                      "South African Niger-Congo",
                      "East African Nilo-Saharan",
-                     "East African Afro-Asiatic",
+                     "East African Afroasiatic",
                      "KhoeSan",
                      "Eurasia")
     l <- legend("top",legend=c(legend_text,"main event ancestry"),

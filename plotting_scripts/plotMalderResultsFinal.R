@@ -87,16 +87,17 @@ for(analy in c("HAPMAP","AfrMap","CeuMap"))
         layout(matrix(c(1,1,1,2,2,2,3,3,3,4,5,6),3,4),widths=c(4,1,1,3))
         par(mar=c(4,12,4,0.5))
         
-        comp_ax <- c(0,240)
+        #comp_ax <- c(0,400)
         #x_labs3 <- c(2000,0,-2000,-5000,-10000)    
         #x_labs3char <- c("2000\nCE",0,"2000\nBCE","5000\nBCE","10000\nBCE")
-        x_labs3 <- c(2000,0,-2000,-5000,-7500)
-        x_labs3char <- c("2000\nCE",0,"2000\nBCE","5000\nBCE","7500\nBCE")
+        comp_ax <- c(0,240)
+        x_labs3 <- c(2000,0,-2000,-5000)
+        x_labs3char <- c("2000\nCE",0,"2000\nBCE","5000\nBCE")
     
         x_max <- min(x_labs3)
         plot(0,0,xlim=rev(range(x_labs3)),
              ylim=c(n_pops,1),type="n",axes=F,xlab="",ylab="")
-        text(5000,-1,labels=LETTERS[1],adj=0,las=1,cex=2,lwd=3,xpd=T)
+        text(poplabpos+2000,-1,labels=LETTERS[1],adj=0,las=1,cex=2,lwd=3,xpd=T)
         axis(1,at=x_labs3,labels=x_labs3char,cex.axis=1,tick=F,padj=0.5)
         for(j in x_labs3) abline(v=j,lty=2)
         mtext("Date of Admixture",1,line=3)
@@ -111,9 +112,14 @@ for(analy in c("HAPMAP","AfrMap","CeuMap"))
         }
         
         ## SET THE SCENE
+#         poplabpos <- 4600
+#         ev1pos1 <- 4400
+#         ev1pos2 <- 3800
+#         ev2pos1 <- 3100
+#         ev2pos2 <- 2600
         poplabpos <- 4600
-        ev1pos1 <- 4400
-        ev1pos2 <- 3800
+        ev1pos1 <- 4100
+        ev1pos2 <- 3600
         ev2pos1 <- 3100
         ev2pos2 <- 2600
     
@@ -157,9 +163,21 @@ for(analy in c("HAPMAP","AfrMap","CeuMap"))
                         mainancp <- tt$Main.Anc.p[j]
                     
                         ## PLOT DATE
-                        arrows(makeDate(date-dateci,add_BCE=F),i,
-                               makeDate(date+dateci,add_BCE=F),i,
-                               angle=90,length=0.025,code=3)
+                        dh <- makeDate(date-dateci,add_BCE=F)
+                        dl <- makeDate(date+dateci,add_BCE=F)
+                        if(!is.na(dl) & dl > x_labs3[length(x_labs3)])
+                        {
+                            arrows(dh,i,dl,i,angle=90,length=0.025,code=3)
+                        } else
+                        {
+                            arrows(dh,i,dl,i,angle=90,length=0.025,code=3)
+                            dl <- x_labs3[length(x_labs3)]
+                            xrange <- range(x_labs3)[2]-range(x_labs3)[1]
+                            dl <- dl - 0.04*xrange
+                            arrows(dh,i,dl,i,angle=45,length=0.025,code=2)
+                        }
+                        
+                        
                         pcol1 <- pcolshex[ancreg_list==donanc1]
                         pcol2 <- pcolshex[ancreg_list==donanc2]
                         pnt_bg <- "black"
@@ -190,7 +208,6 @@ for(analy in c("HAPMAP","AfrMap","CeuMap"))
                     }
                 }
             }
-            
         }
 
         ## PLOT SOME
@@ -323,9 +340,9 @@ for(analy in c("HAPMAP","AfrMap","CeuMap"))
                       sapply(ys,function(x)makeDate(x,add_BCE=F)))
             }
             ## GET SYMBOLS, COLS, ETC FOR EACH POP AND PLOT
-            pop_pnts <- getPopSymbols(tidyNames(unique(dates2plot$EthnicGroup),fula=F),leginfo)
-            points(sapply(dates2plot$Date.Gens[plotx],function(x)makeDate(x,add_BCE=F)),
-                   sapply(dates2plot$Date.Gens[ploty],function(x)makeDate(x,add_BCE=F)),
+            pop_pnts <- getPopSymbols(tidyNames(dates2plot$EthnicGroup[plotx],fula=F),leginfo)
+            points(sapply(dates2plot$Date.Gens[plotx],function(x){makeDate(x,add_BCE=F)}),
+                   sapply(dates2plot$Date.Gens[ploty],function(x){makeDate(x,add_BCE=F)}),
                    pch=as.numeric(pop_pnts$pch2plot),
                    col=pop_pnts$rim2plot,
                    bg=pop_pnts$col2plot)
