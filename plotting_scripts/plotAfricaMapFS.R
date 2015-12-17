@@ -47,6 +47,7 @@ pdf("figures/Figure1new.pdf",width=10,height=5)
     pt_cex <- 2
     pt_lwd <- 0.75
     plot_legends <- TRUE
+    plot_letter <- TRUE
     source("plotting_scripts/africamap.R")
     ###########################################################
     ## 01 PC 1 v 2

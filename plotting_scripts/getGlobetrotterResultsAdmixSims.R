@@ -230,7 +230,7 @@ for (analy in c("main","ancient"))
 ## plot just those using JUHOAN / CEU?
 ## think about running bootstraps?
 
-get_dates <- FALSE
+get_dates <- TRUE
 if(get_dates == T)
 {
     #############################################################

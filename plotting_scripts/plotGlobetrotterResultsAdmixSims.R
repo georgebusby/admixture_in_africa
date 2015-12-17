@@ -205,7 +205,7 @@ for(i in 1:ncol(all_plot_mat))
 ##################################################################################
 ## PULL IN THE RESULTS OF THE MIXTURE MODEL (RUN ELSEWHERE)
 ## HAVEN'T DONE THIS FOR THE SIMS
-mix_dir <- "/mnt/kwiat/well/human/george/admix_sims/globetrotter/props/"
+# mix_dir <- "/mnt/kwiat/well/human/george/admix_sims/globetrotter/props/"
 # GENERATE A MIXTURE MATRIX, IF NONE ALREADY
 # mixmat <- matrix(0,ncol=length(popplot),nrow=nrow(sim_tab))
 # rownames(mixmat) <- levels(sim_tab$sim_pops)

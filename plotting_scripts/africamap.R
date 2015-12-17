@@ -64,7 +64,7 @@ if(plot_equator==T)
 
 box()
 
-legend("bottomright",legend="A",cex=2,bty="n")
+if(plot_letter == TRUE) legend("bottomright",legend="A",cex=2,bty="n")
 
 ## PLOT POINTS, ALLOWING FOR MULTIPLE POPS FROM THE SAME COUNTRY
 newi <- plotPopPoints(latlong_file,leginfo_file,poppos_file,pt_cex=2)

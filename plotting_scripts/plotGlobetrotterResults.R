@@ -37,7 +37,8 @@ popplotorder <- popplot
 popplot <- factor(popplot,levels=popplotorder)
 
 ## PULL IN DATA
-admixturesources2 <- read.table("data/MalariaGenGlobetrotterAdmixtureSources3.txt",header=T,row.names=1,as.is=T)
+admixturesources2 <- read.table("data/MalariaGenGlobetrotterAdmixtureSources3.txt",
+                                header=T,row.names=1,as.is=T)
 final.res2plot <- read.table("data/MalariaGenGlobetrotter2plot.txt",header=T,row.names=1,as.is=T)
 admixturesources2 <- admixturesources2[,levels(popplot)]
 dateboots <- read.table("data/MalariaGenGlobetrotterOneDateBootstraps.txt",header=T,row.names=1,as.is=T)

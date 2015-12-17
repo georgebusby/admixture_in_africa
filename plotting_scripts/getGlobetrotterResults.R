@@ -242,23 +242,26 @@ finaltable$Date.CI <- finaltable$dateL <- finaltable$dateH <- NA
 
 #############################################################
 ## FILL IN DATES AND CIS IN THE MAIN RESULTS TABLE
-rowindex <- match(paste(dateboots2[,1],"main",sep="."),
-                  paste(finaltable$Cluster,finaltable$Analysis,sep="."),nomatch=0)
-finaltable$Date.CI[rowindex] <- paste0("(",dateboots2[,2],"-",dateboots2[,3],")")
-finaltable$dateL[rowindex] <- dateboots3[,2]
-finaltable$dateH[rowindex] <- dateboots3[,3]
 
-finaltable$Date2a.CI <- finaltable$date2aL <- finaltable$date2aH <- finaltable$Date2b.CI <- finaltable$date2bL <- finaltable$date2bH <- NA
-rowindex <- match(paste(date2boots2[,1],"main",sep="."),
-                  paste(finaltable$Cluster,finaltable$Analysis,sep="."),nomatch=0)
-
-finaltable$Date2a.CI[rowindex] <- paste0("(",date2boots2[,2],"-",date2boots2[,3],")")
-finaltable$date2aL[rowindex] <- date2boots3[,2]
-finaltable$date2aH[rowindex] <- date2boots3[,3]
-finaltable$Date2b.CI[rowindex] <- paste0("(",date2boots2[,4],"-",date2boots2[,5],")")
-finaltable$date2bL[rowindex] <- date2boots3[,4]
-finaltable$date2bH[rowindex] <- date2boots3[,5]
-
+for(analy in c("main","main.null"))
+{
+    rowindex <- match(paste(dateboots2[,1],analy,sep="."),
+                      paste(finaltable$Cluster,finaltable$Analysis,sep="."),nomatch=0)
+    finaltable$Date.CI[rowindex] <- paste0("(",dateboots2[,2],"-",dateboots2[,3],")")
+    finaltable$dateL[rowindex] <- dateboots3[,2]
+    finaltable$dateH[rowindex] <- dateboots3[,3]
+    
+    finaltable$Date2a.CI <- finaltable$date2aL <- finaltable$date2aH <- finaltable$Date2b.CI <- finaltable$date2bL <- finaltable$date2bH <- NA
+    rowindex <- match(paste(date2boots2[,1],analy,sep="."),
+                      paste(finaltable$Cluster,finaltable$Analysis,sep="."),nomatch=0)
+    
+    finaltable$Date2a.CI[rowindex] <- paste0("(",date2boots2[,2],"-",date2boots2[,3],")")
+    finaltable$date2aL[rowindex] <- date2boots3[,2]
+    finaltable$date2aH[rowindex] <- date2boots3[,3]
+    finaltable$Date2b.CI[rowindex] <- paste0("(",date2boots2[,4],"-",date2boots2[,5],")")
+    finaltable$date2bL[rowindex] <- date2boots3[,4]
+    finaltable$date2bH[rowindex] <- date2boots3[,5]
+}
 #############################################################
 ### MAKE SOME PRETTY RESULTS TABLES AND STORE FOR PLOTTING
 allcols <- c("Cluster","Analysis","pval","maxScore2ev","max.R1.","FQ1","FQ2","Result")
@@ -422,7 +425,7 @@ res.tabB <- res.tabB[,!colnames(res.tabB)%in%c("Date.CI","Date2a.CI","Date2b.CI"
 namecols <- c("Cluster",grep("source",colnames(res.tabB),value=T))
 for(i in namecols)
 {
-    tmp <- tidyNames(res.tabB[,i], fula=F)
+    tmp <- tidyNames(res.tabB[,i], fula=T, khoesan=T)
     res.tabB[,i] <- tmp
 }
 #############################################################
@@ -480,7 +483,7 @@ res.tabA <- res.tabA[,!colnames(res.tabA)%in%c("Date.CI","Date2a.CI","Date2b.CI"
 namecols <- c("Cluster",grep("source",colnames(res.tabA),value=T))
 for(i in namecols)
 {
-    tmp <- tidyNames(res.tabA[,i], fula=F)
+    tmp <- tidyNames(res.tabA[,i], fula=T, khoesan=T)
     res.tabA[,i] <- tmp
 }
 
