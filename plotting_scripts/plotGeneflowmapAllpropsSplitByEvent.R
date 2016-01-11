@@ -20,10 +20,12 @@ setwd(paste0(main_dir,"popgen/"))
 leginfo_file <- "data/MalariaGenAdmixturePopulationKey.txt"
 mapinfo_file <- "data/MalariaGenAdmixturePopulationKey2.txt"
 latlong_file <- "data/MalariaGenAdmixturePopulationKeyLatLongs.txt"
+poppos_file <- "data/MalariaGenAdmixturePopulationKeyMapPositions.txt"
 
 leginfo <-read.table(leginfo_file,header=T,comment.char="")
 newi <- plotPopPoints(latlong_file,leginfo_file,poppos_file,pt_cex=2)
 pointsonly <- unique(cbind(newi$Lat,newi$Long))
+mapinfo <- read.table(mapinfo_file,header=T,comment.char="")
 
 ## SET PLOTTING PARAMETERS
 plotSep <- FALSE ## plot individually
@@ -60,9 +62,10 @@ euroxy <- data.frame(euroxy,stringsAsFactors = FALSE)
 colnames(euroxy) <- c("pop","y","x","cols")
 
 propslessthan <- 0.025
-
+newmap2<-joinCountryData2Map(mapinfo,joinCode="ISO_A3",nameJoinColumn="pop",verbose=FALSE)
 ######################################################
 ## PLOT FIGURE 6 FROM MAIN PAPER
+
 
 pdf("figures/AfricadmixtureEventsMapAllPropsOver025SplitByEvent.pdf",height=10,width=10)
 layout(matrix(1:4,2,2,byrow=T))

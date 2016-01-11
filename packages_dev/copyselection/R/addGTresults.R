@@ -38,6 +38,7 @@ addGTresults <- function(pltable, rev_pops){
             if(length(revg>0)) gens[revg] <- -gens[revg]
             gen1 <- as.numeric(gens[1])
             gen2 <- as.numeric(gens[2])
+            if(a == "main.null") a <- "null"
             src1 <- admixturesources2[paste(pop,a,1,sep="."),]
             src2 <- admixturesources2[paste(pop,a,2,sep="."),]
             bsrc1 <- pltable$best.source1[pltable$Cluster==pop]
@@ -84,6 +85,7 @@ addGTresults <- function(pltable, rev_pops){
             if(length(revg>0)) gens[revg] <- -gens[revg]
             gen1 <- as.numeric(gens[1])
             gen2 <- as.numeric(gens[2])
+            if(a == "main.null") a <- "null"
             src1 <- admixturesources2[paste(pop,a,1,sep="."),]
             src2 <- admixturesources2[paste(pop,a,2,sep="."),]
             src3 <- admixturesources2[paste(pop,a,3,sep="."),]
@@ -151,6 +153,7 @@ addGTresults <- function(pltable, rev_pops){
                 gen1 <- NA
                 gen2 <- NA
             }
+            if(a == "main.null") a <- "null"
             src1 <- admixturesources2[paste(pop,a,5,sep="."),]
             src2 <- admixturesources2[paste(pop,a,6,sep="."),]
             src3 <- admixturesources2[paste(pop,a,7,sep="."),]

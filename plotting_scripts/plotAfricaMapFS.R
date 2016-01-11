@@ -25,14 +25,25 @@ mat_file <- paste0("data/",fsanalyname,"CoAncestry.txt")
 popkey <- read.table(popkey_file,header=T,as.is=T)
 popkey$Ethnic_Group <- toupper(popkey$Ethnic_Group)
 
-pdf("figures/Figure1new.pdf",width=10,height=5)
+# pdf("figures/Figure1new.pdf",width=10,height=5)
+#     par(mar=c(0.5,0.5,0.5,0.5))
+#     layout(matrix(c(1,2,3,4,11,10,
+#                     1,2,3,4,7,8,
+#                     5,6,6,6,7,8,
+#                     5,6,6,6,12,9),4,6,byrow=T),
+#            width=c(2.5,rep((2.5/3),3),1,4),
+#            height=c(1,1.5,2,0.5))
+pdf("figures/Figure1new.pdf",width=6,height=12)
     par(mar=c(0.5,0.5,0.5,0.5))
-    layout(matrix(c(1,2,3,4,11,10,
-                    1,2,3,4,7,8,
-                    5,6,6,6,7,8,
-                    5,6,6,6,12,9),4,6,byrow=T),
-           width=c(2.5,rep((2.5/3),3),1,4),
-           height=c(1,1.5,2,0.5))
+    layout(matrix(c(1,1,2,3,4,
+                    5,5,6,6,6,
+                    11,10,10,10,10,
+                    7,8,8,8,8,
+                    12,9,9,9,9),5,5,byrow=T),
+           width=c(1,2,1,1,1),
+           height=c(3,3,0.5,5,0.5))
+
+
     ###########################################################
     ## 00 MAP AND LEGENDS
     transparent_cols <- FALSE ## use transparent colours for malariagen countries
@@ -48,6 +59,7 @@ pdf("figures/Figure1new.pdf",width=10,height=5)
     pt_lwd <- 0.75
     plot_legends <- TRUE
     plot_letter <- TRUE
+    plot_points <- TRUE
     source("plotting_scripts/africamap.R")
     ###########################################################
     ## 01 PC 1 v 2

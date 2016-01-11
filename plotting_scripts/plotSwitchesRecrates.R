@@ -1,8 +1,7 @@
-
-
-
 ## ALL DATA ARE STORED IN AN hdf5 FILE
-datafile <- '/mnt/kwiat/well/human/george/copy_selection/hdf5files/MalariaGenSelectionPaintings.hdf5'
+
+#datafile <- '/mnt/kwiat/well/human/george/copy_selection/hdf5files/MalariaGenSelectionPaintings.hdf5'
+datafile <- '/well/malariagen/malariagen/human/george/copy_selection/hdf5files/MalariaGenSelectionPaintings.hdf5'
 
 library("rhdf5")
 library("bigmemory")
@@ -107,7 +106,8 @@ axis(1)
 axis(2,las=2)
 box()
 ## FIND AND PLOT LACTASE AND DUFFY REGION
-snps <- read.table("/mnt/kwiat/data/bayes/users/george/popgen/analysis3/chromopainter/snpfiles/AllPops330Kphased.legend")
+#snps <- read.table("/mnt/kwiat/data/bayes/users/george/popgen/analysis3/chromopainter/snpfiles/AllPops330Kphased.legend")
+snps <- read.table("/data/bayes/users/george/popgen/analysis3/chromopainter/snpfiles/AllPops330Kphased.legend")
 colnames(snps)<- c("chrom","rsid","pos","a0","a1")
 
 lct <- (1:nrow(snps))[snps$chrom==2 & snps$pos>136.5e6 & snps$pos < 136.75e6]

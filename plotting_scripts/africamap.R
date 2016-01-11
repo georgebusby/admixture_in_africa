@@ -18,7 +18,8 @@ mapinfo <- data.frame(mapinfo)
 ## set colour to factor
 mapinfo$colour <- factor(mapinfo$colour,levels=unique(mapinfo$colour))
 ## generate a vector of regions for each ethnic group
-newcols <- copyselection::getPopRegion(mapinfo$EthnicGroup,popkey)
+tmpgrp <- gsub("MANDINKA","MANDINKAII",mapinfo$EthnicGroup)
+newcols <- getPopRegion(tmpgrp,popkey)
 newcols <- factor(newcols, levels=regions)
 mapinfo <- cbind(mapinfo,newcols)
 colnames(mapinfo)[ncol(mapinfo)] <- "region"
@@ -67,7 +68,7 @@ box()
 if(plot_letter == TRUE) legend("bottomright",legend="A",cex=2,bty="n")
 
 ## PLOT POINTS, ALLOWING FOR MULTIPLE POPS FROM THE SAME COUNTRY
-newi <- plotPopPoints(latlong_file,leginfo_file,poppos_file,pt_cex=2)
+if(plot_points == TRUE) newi <- plotPopPoints(latlong_file,leginfo_file,poppos_file,pt_cex=2)
 
 ###########################################################
 ## PLOT THREE SEPARATE LEGENDS
