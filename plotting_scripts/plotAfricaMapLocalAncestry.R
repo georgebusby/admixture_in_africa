@@ -33,7 +33,6 @@ pdf("figures/LocalAncestryOverview.pdf",width=6,height=6)
                     4,4),4,2,byrow=T),
            heights=c(3,0.75,0.75,1.5),widths=c(3,3))
            
-
     ###########################################################
     ## 00 MAP AND LEGENDS
     transparent_cols <- FALSE ## use transparent colours for malariagen countries
@@ -58,8 +57,9 @@ pdf("figures/LocalAncestryOverview.pdf",width=6,height=6)
     latlongs <- read.csv(latlong_file,header=T)
     points(latlongs$Long,latlongs$Lat,pch=20,cex=1)    
     ## ADD A LEGEND
-    legend("bottomleft",legend=gsub("Africa ","",gsub("\\_"," ",ancreg_list)),
+    legend("bottomleft",legend=gsub("Africa ","",gsub("\\_"," ",regions)),
            fill=pcolshex,border=pcolshex,bty="n",title="Ancestry Regions")
+
     #########################################################
     ## 01 PLOT A PAINTED CHROMOSOME
     library("rhdf5")

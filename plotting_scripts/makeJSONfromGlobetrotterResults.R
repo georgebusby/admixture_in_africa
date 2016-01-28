@@ -45,9 +45,6 @@ dateboots <- read.table("data/MalariaGenGlobetrotterOneDateBootstraps.txt",heade
 date2boots <- read.table("data/MalariaGenGlobetrotterTwoDateBootstraps.txt",header=T,row.names=1,as.is=T)
 best_ald <- read.table("data/MalariaGenBestAlder.txt",header=T,as.is=T,comment.char="",fill=T)
 
-## reorder admixturesources2 columns
-##neworder <- colnames(admixturesources2)[c(1:26,38:41,27:37,42:60)]
-##admixturesources2 <- admixturesources2[,neworder]
 
 ## DEFINE THE REGION AND COLOURS FOR EACH OF THE DIFFERENT SOURCES
 srcreg <- getPopRegion(tidyNames(colnames(admixturesources2),fula=T),popkey)
@@ -163,7 +160,7 @@ for(i in 1:ncol(all_plot_mat))
 
 ##################################################################################
 ## PULL IN THE RESULTS OF THE MIXTURE MODEL (RUN ELSEWHERE)
-mixmat <- read.table("data/Malgen23EthnicGroups1KGNoAmericaFinalAnalysisNonLocalNNLS.txt",header=T,row.names=1,as.is=T)
+mixmat <- read.table("data/Malgen23EthnicGroups1KGNoAmericaFinalAnalysisNNLS.txt",header=T,row.names=1,as.is=T)
 ## EDIT POPKEY TO GIVE A BRAND NEW COLOUR TO THE FULANI
 popkey$RegionM[popkey$Ethnic_Group == "FULAI"] <- "Fulani"
 popkey$RegionM[popkey$Ethnic_Group == "SEMI.BANTU"] <- "Semi"
@@ -405,7 +402,7 @@ for(i in poporder)
 }
 for(i in 1:n_pops)
 {
-    axis(2,pos=poplabpos,at=i,labels=tidyNames(poporder[i],fula=T,khoesan=T,tig=T),
+    axis(2,pos=poplabpos,at=i,labels=tidyNames(poporder[i],fula=T,khoesan=T),
          col.axis=y_ax_cols[i],las=2,tck=0,lwd=0,line=-0.5)
 }
 for(i in seq(0.5,(n_pops+1),1)) abline(h=i,lty=3,lwd=0.5)

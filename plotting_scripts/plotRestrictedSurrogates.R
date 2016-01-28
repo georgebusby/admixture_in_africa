@@ -260,7 +260,7 @@ pdf(paste("figures/GLOBETROTTERnolocalSourcesFullColour.pdf",sep=""),height=10,w
                   xaxt="n",main="")
     for(i in 1:ncol(tmp_mat))
     {
-        axis(2,at=bp[i],labels=tidyNames(plotpops[i],fula=T,khoesan=T),
+        axis(2,at=bp[i],labels=tidyNames(plotpops[i],fula=T,khoesan=T,tig=T),
              pos=1,las=2,lwd=0,col.axis=rev(y_ax_cols)[i])
     }
     for(i in c("main",altruns2))
@@ -327,7 +327,7 @@ pdf(paste("figures/GLOBETROTTERnolocalSourcesMalawiCameroon.pdf",sep=""),height=
                   xaxt="n",main="")
     for(i in 1:ncol(tmp_mat))
     {
-        axis(2,at=bp[i],labels=tidyNames(plotpops[i],fula=T,khoesan=T),
+        axis(2,at=bp[i],labels=tidyNames(plotpops[i],fula=T,khoesan=T,tig=T),
              pos=1,las=2,lwd=0,col.axis=rev(y_ax_cols)[i])
     }
     for(i in c("main",altruns2))

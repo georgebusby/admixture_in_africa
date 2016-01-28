@@ -72,8 +72,8 @@ pdf("figures/AllPopsPairwiseFst.pdf",height=10,width=11)
         ii <- pcolshex[ancreg_list==as.character(popkey$RegionM[popkey$Ethnic_Group==i])]
         axpos1 <- (1:length(popplot))[i==popplot]
         axpos2 <- (length(popplot):1)[i==popplot]
-        mtext(2,text=tidyNames(i,fula=T,khoesan=T),at=axpos2,col=ii,las=2,line=0.5)
-        mtext(3,text=tidyNames(i,fula=T,khoesan=T),at=axpos1,col=ii,las=2,line=0.5)
+        mtext(2,text=tidyNames(i,fula=T,khoesan=T,tig=T),at=axpos2,col=ii,las=2,line=0.5)
+        mtext(3,text=tidyNames(i,fula=T,khoesan=T,tig=T),at=axpos1,col=ii,las=2,line=0.5)
     }
     ## SCALE
     scalesplit <- 10
@@ -243,8 +243,8 @@ pdf("figures/AllPopsPairwiseTVD.pdf",height=10,width=11)
         ii <- pcolshex[ancreg_list==as.character(popkey$RegionM[popkey$Ethnic_Group==i])]
         axpos1 <- (1:length(popplot))[i==popplot]
         axpos2 <- (length(popplot):1)[i==popplot]
-        mtext(2,text=tidyNames(i,fula=T,khoesan=T),at=axpos2,col=ii,las=2,line=0.5)
-        mtext(3,text=tidyNames(i,fula=T,khoesan=T),at=axpos1,col=ii,las=2,line=0.5)
+        mtext(2,text=tidyNames(i,fula=T,khoesan=T,tig=T),at=axpos2,col=ii,las=2,line=0.5)
+        mtext(3,text=tidyNames(i,fula=T,khoesan=T,tig=T),at=axpos1,col=ii,las=2,line=0.5)
     }
     ## SCALE
     scalesplit <- 10
@@ -278,7 +278,7 @@ bothmat[bothmat>ignoreabove] <- ignoreabove
 ## now re-scale so that the units are same as fstmat (max(fstmat) = 0.25)
 bothmat <- bothmat/3
 bothmat <- bothmat[rev(rownames(bothmat)),]
-repmat <- t(fstmat[rev(rownames(fstmat)),]) #rev(colnames(fstmat))
+repmat <- t(fstmat[rev(rownames(fstmat)),rev(colnames(fstmat))]) #
 bothmat[upper.tri(bothmat)] <- repmat[upper.tri(repmat)]
 bothmat <- bothmat[rev(rownames(bothmat)),]
 
@@ -313,8 +313,8 @@ pdf("figures/AllPopsPairwiseFSTTVD.pdf",height=10,width=12)
         ii <- pcolshex[ancreg_list==as.character(popkey$RegionM[popkey$Ethnic_Group==i])]
         axpos1 <- (1:length(popplot))[i==popplot]
         axpos2 <- (length(popplot):1)[i==popplot]
-        mtext(2,text=tidyNames(i,fula=T,khoesan=T),at=axpos2,col=ii,las=2,line=0.5)
-        mtext(3,text=tidyNames(i,fula=T,khoesan=T),at=axpos1,col=ii,las=2,line=0.5)
+        mtext(2,text=tidyNames(i,fula=T,khoesan=T,tig=T),at=axpos2,col=ii,las=2,line=0.5)
+        mtext(3,text=tidyNames(i,fula=T,khoesan=T,tig=T),at=axpos1,col=ii,las=2,line=0.5)
     }
     box()
     mtext(3,text="A",adj=0,line=4,cex=2,xpd=T,at=-5)

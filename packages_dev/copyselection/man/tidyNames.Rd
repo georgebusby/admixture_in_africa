@@ -4,7 +4,7 @@
 \alias{tidyNames}
 \title{this is an internal function that converts a list of names}
 \usage{
-tidyNames(x, fula = F, pel = F, khoesan = F)
+tidyNames(x, fula = F, pel = F, khoesan = F, tig = F)
 }
 \arguments{
 \item{x}{a list of names}

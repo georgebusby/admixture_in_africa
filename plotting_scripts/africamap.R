@@ -110,7 +110,7 @@ if(plot_legends == TRUE)
         par(mar=c(0,0,0,0))
         plot(0,0,type="n",axes=F,xlab="",ylab="")
         legend("topleft",ncol=1,
-               legend=c(paste0(tidyNames(as.character(leginfo$EthnicGroup),khoesan=T),
+               legend=c(paste0(tidyNames(as.character(leginfo$EthnicGroup),khoesan=T,tig=T),
                                                " [",as.character(leginfo$pop_nums),"]")),
                pch=as.numeric(leginfo$poppch),
                pt.bg=as.character(leginfo$Colour),

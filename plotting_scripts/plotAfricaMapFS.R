@@ -25,7 +25,7 @@ mat_file <- paste0("data/",fsanalyname,"CoAncestry.txt")
 popkey <- read.table(popkey_file,header=T,as.is=T)
 popkey$Ethnic_Group <- toupper(popkey$Ethnic_Group)
 
-# pdf("figures/Figure1new.pdf",width=10,height=5)
+# pdf("figures/Figure1newLS.pdf",width=10,height=5)
 #     par(mar=c(0.5,0.5,0.5,0.5))
 #     layout(matrix(c(1,2,3,4,11,10,
 #                     1,2,3,4,7,8,
@@ -74,7 +74,7 @@ pdf("figures/Figure1new.pdf",width=6,height=12)
     ## 02 PC 1 v 3
     xplot <- 3 ## x-axis pc to plot
     yplot <- 1 ## y-axis pc to plot
-    revX <- T ## should x-axis be reversed
+    revX <- F ## should x-axis be reversed
     revY <- T ## should y-axis be reversed
     panel_letter <- "C"
     source("plotting_scripts/africapca.R")

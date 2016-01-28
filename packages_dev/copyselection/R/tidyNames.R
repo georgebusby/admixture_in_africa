@@ -9,7 +9,7 @@
 #' @examples
 #' tidyNames("ESOMALI", fula=T)
 
-tidyNames <- function(x,fula=F,pel=F,khoesan=F){
+tidyNames <- function(x,fula=F,pel=F,khoesan=F,tig=F){
   x <- gsub("IBD","",x)
   x <- gsub("CULTIVATOR","",x)
   x <- gsub("BLACKSMITH","",x)
@@ -43,6 +43,11 @@ tidyNames <- function(x,fula=F,pel=F,khoesan=F){
       x <- gsub("XUN","!XUN",x)
       x <- gsub("==KHOMANI","=KHOMANI",x)
   }
+  if(tig == T)
+  {
+     x <- gsub("TYGRAY","TIGRAY",x)
+  }
+  
   return(x)
 }
 

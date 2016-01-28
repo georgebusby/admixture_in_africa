@@ -27,7 +27,7 @@ poplist<- as.matrix(poplist)
 n_pops <- nrow(poplist)
 in_dir <- "/mnt/kwiat/data/bayes/users/george/popgen/analysis3/alder/output/"
 analys <- c("HAPMAP","CeuMap","AfrMap")
-malder_file <- "~/R/Copy/Rprojects/AfricaPOPGEN/manuscript/f3tables/AllPopsMalderFinalALLmindis.txt"
+malder_file <- "~/R/Copy/Rprojects/AfricaPOPGEN/manuscript/f3tables/AllPopsMalderFinalALL.txt"
 malder_plot <- read.table(malder_file,header=T, as.is=T)
 leginfo_file <- "data/MalariaGenAdmixturePopulationKey.txt"
 leginfo <- read.table(leginfo_file,header=T,comment.char="", as.is = T)
@@ -82,12 +82,16 @@ for(analy in c("HAPMAP","AfrMap","CeuMap"))
     
     ##################################################################
     ## PLOT DATES AND MAP COMPARISONS
-    pdf(paste0("figures/AllPopsMalderTimesMapCompsMinDis",analy,".pdf"),height=9,width=9)
+    pdf(paste0("figures/AllPopsMalderTimesMapComps",analy,".pdf"),height=9,width=9)
         layout(matrix(c(1,1,1,2,3,4),3,2),widths=c(6,3))
         par(mar=c(4,16,4,1))
-        x_labs3 <- c(2000,0,-2000,-5000,-10000)
         comp_ax <- c(0,400)
+        comp_ax <- c(0,240)
+        x_labs3 <- c(2000,0,-2000,-5000,-10000)
         x_labs3char <- c("2000\nCE",0,"2000\nBCE","5000\nBCE","10000\nBCE")
+        x_labs3 <- c(2000,0,-2000,-5000)
+        x_labs3char <- c("2000\nCE",0,"2000\nBCE","5000\nBCE")
+    
         x_max <- min(x_labs3)
         plot(0,0,xlim=rev(range(x_labs3)),
              ylim=c(n_pops,1),type="n",axes=F,xlab="",ylab="")
@@ -107,7 +111,7 @@ for(analy in c("HAPMAP","AfrMap","CeuMap"))
         
         ## SET THE SCENE
         for(i in 1:n_pops) axis(2,pos=4000,at=i,
-                                labels=tidyNames(pop_vec[i],fula=T),
+                                labels=tidyNames(pop_vec[i],fula=T, khoesan=T,tig=T),
                                 col.axis=y_ax_cols[i],las=2,tck=0,lwd=0,line=-0.5)
         
         for(i in seq(0.5,(n_pops+1),1)) abline(h=i,lty=3,lwd=0.5)
@@ -129,45 +133,48 @@ for(analy in c("HAPMAP","AfrMap","CeuMap"))
             tt <- malder[malder$EthnicGroup==pop1,]
             tt <- tt[order(tt$Date.Gens),]
             res_tmp <- nrow(tt)
-            if(nrow(tt)>0 & tt$Date.Gens>0)
+            if(nrow(tt)>0)
             {
-                for(j in 1:nrow(tt))
+                if(tt$Date.Gens>0)
                 {
-                    date <- tt$Date.Gens[j]
-                    dateci <- tt$Date.Gens.CI[j]
-                    donpop1 <- strsplit(tt$Test.Pops[j],split="\\;")[[1]][1]
-                    donanc1 <- getPopRegion(tidyNames(donpop1,fula=T),popkey)
-                    donpop2 <- strsplit(tt$Test.Pops[j],split="\\;")[[1]][2]
-                    donanc2 <- getPopRegion(tidyNames(donpop2,fula=T),popkey)
-                    mainanc <- tt$Main.Anc[j]
-                    mainancp <- tt$Main.Anc.p[j]
-                
-                    ## PLOT DATE
-                    arrows(makeDate(date-dateci,add_BCE=F),i,
-                           makeDate(date+dateci,add_BCE=F),i,
-                           angle=90,length=0.025,code=3)
-                    pcol1 <- pcolshex[ancreg_list==donanc1]
-                    pcol2 <- pcolshex[ancreg_list==donanc2]
-                    pnt_bg <- "black"
-                    if(mainancp>0.001) pnt_bg <- "grey"
-                    if(mainancp>0.05) pnt_bg <- "white"
-                    points(makeDate(date,add_BCE=F),i,pch=21,bg=pnt_bg, cex=2)
-                
-                    ## PLOT EVENT ANCESTRIES
-                    if(j == 1)
+                    for(j in 1:nrow(tt))
                     {
-                        points(ev1posa,i,pch=15,col=pcol1,xpd=T,cex=2)
-                        points(ev1posb,i,pch=15,col=pcol2,xpd=T,cex=2)
-                        if(donanc1 == mainanc) points(ev1posa,i,pch=22,xpd=T,cex=2,lwd=1.5)
-                        if(donanc2 == mainanc) points(ev1posb,i,pch=22,xpd=T,cex=2,lwd=1.5)
-                    }
+                        date <- tt$Date.Gens[j]
+                        dateci <- tt$Date.Gens.CI[j]
+                        donpop1 <- strsplit(tt$Test.Pops[j],split="\\;")[[1]][1]
+                        donanc1 <- getPopRegion(tidyNames(donpop1,fula=T),popkey)
+                        donpop2 <- strsplit(tt$Test.Pops[j],split="\\;")[[1]][2]
+                        donanc2 <- getPopRegion(tidyNames(donpop2,fula=T),popkey)
+                        mainanc <- tt$Main.Anc[j]
+                        mainancp <- tt$Main.Anc.p[j]
                     
-                    if(j == 2)
-                    {    points(ev2posa,i,pch=15,col=pcol1,xpd=T,cex=2)
-                         points(ev2posb,i,pch=15,col=pcol2,xpd=T,cex=2)
-                         if(donanc1 == mainanc) points(ev2posa,i,pch=22,xpd=T,cex=2,lwd=1.5)
-                         if(donanc2 == mainanc) points(ev2posb,i,pch=22,xpd=T,cex=2,lwd=1.5)
-                    }     
+                        ## PLOT DATE
+                        arrows(makeDate(date-dateci,add_BCE=F),i,
+                               makeDate(date+dateci,add_BCE=F),i,
+                               angle=90,length=0.025,code=3)
+                        pcol1 <- pcolshex[ancreg_list==donanc1]
+                        pcol2 <- pcolshex[ancreg_list==donanc2]
+                        pnt_bg <- "black"
+                        #if(mainancp>0.001) pnt_bg <- "grey"
+                        #if(mainancp>0.05) pnt_bg <- "white"
+                        points(makeDate(date,add_BCE=F),i,pch=21,bg=pnt_bg, cex=2)
+                    
+                        ## PLOT EVENT ANCESTRIES
+                        if(j == 1)
+                        {
+                            points(ev1posa,i,pch=15,col=pcol1,xpd=T,cex=2)
+                            points(ev1posb,i,pch=15,col=pcol2,xpd=T,cex=2)
+                            if(donanc1 == mainanc) points(ev1posa,i,pch=22,xpd=T,cex=2,lwd=1.5)
+                            if(donanc2 == mainanc) points(ev1posb,i,pch=22,xpd=T,cex=2,lwd=1.5)
+                        }
+                        
+                        if(j == 2)
+                        {    points(ev2posa,i,pch=15,col=pcol1,xpd=T,cex=2)
+                             points(ev2posb,i,pch=15,col=pcol2,xpd=T,cex=2)
+                             if(donanc1 == mainanc) points(ev2posa,i,pch=22,xpd=T,cex=2,lwd=1.5)
+                             if(donanc2 == mainanc) points(ev2posb,i,pch=22,xpd=T,cex=2,lwd=1.5)
+                        }     
+                    }
                 }
             }
         }
@@ -195,7 +202,7 @@ for(analy in c("HAPMAP","AfrMap","CeuMap"))
     
         ## PLOT DATE COMPARISONS
         ## USE ONLY THOSE POPULATIONS WHERE THE SAME EVENTS ARE INFERRED IN ALL THREE MAP ANALYSES ##
-        test <- malder_plot$Main.Anc.p<0.05 & malder_plot$Date.Gens>0 & malder_plot$N.evs>0
+        test <- malder_plot$Date.Gens>0 & malder_plot$N.evs>0 # malder_plot$Main.Anc.p<0.05
         dates2plot <- malder_plot[test,]
         matching_events <- c()
         for(i in unique(dates2plot$EthnicGroup))
@@ -220,6 +227,7 @@ for(analy in c("HAPMAP","AfrMap","CeuMap"))
         }
         dates2plot <- rbind(tmp,dates2plot)        
         dates2plot <- dates2plot[order(dates2plot$EthnicGroup),]
+        dates2plot <- dates2plot[dates2plot$EthnicGroup!="MOSSI",]
     
         xplot <- "AfrMap"
         xplotlab <- "YRI"

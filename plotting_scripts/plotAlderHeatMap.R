@@ -36,7 +36,7 @@ poplist <- factor(popplotorder,levels=popplotorder)
 poplist<- as.matrix(poplist)
 n_pops <- nrow(poplist)
 all_res <- c()
-for(i in 50:60) #(1:nrow(poplist)))
+for(i in (1:nrow(poplist)))
 {
     pop1 <- as.character(poplist[i,1])
     print(paste("getting alder results for pop:", pop1))
@@ -93,7 +93,7 @@ for(p in pops2plot)
   y_max <- max(y_max,na.rm=T)
   plot(1:nrow(tt),ylim=c(0,y_max),
        axes=F,ylab=expression(paste("amplitude x", 10^-4)),
-       xlab="",main=tidyNames(p,fula=T,khoesan=T))
+       xlab="",main=tidyNames(p,fula=T,khoesan=T,tig=T))
   box()
   #mtext(3,text=LETTERS[let_cnt],adj=0)
   for(j in 1:nrow(tt))
@@ -161,7 +161,7 @@ image(1:ncol(dummy_dat),
 for(i in 1:ncol(dummy_dat))
 {
     axis(3,at=i,las=2,
-         labels=tidyNames(colnames(dummy_dat)[i],fula=T,khoesan=T),
+         labels=tidyNames(colnames(dummy_dat)[i],fula=T,khoesan=T, tig=T),
          cex.axis=0.75,lwd=0, col.axis=y_ax_cols[i])
 }
 mtext(1,line=8,text="reference population amplitude (rank)")
@@ -169,7 +169,7 @@ mtext(2,line=8,text="test population")
 for(i in 1:nrow(dummy_dat))
 {
     axis(2,at=i,las=2,
-         labels=tidyNames(rownames(dummy_dat)[i],fula=T, khoesan=T),
+         labels=tidyNames(rownames(dummy_dat)[i],fula=T, khoesan=T, tig=T),
          tck=0,lwd=0,cex.axis=0.75,col.axis=rev(y_ax_cols[1:48])[i])
 }
 abline(h=1:nrow(dummy_dat)-0.5,col="grey",lwd=0.5)

@@ -125,7 +125,7 @@ for(analy in c("HAPMAP","AfrMap","CeuMap"))
     
         
         for(i in 1:n_pops) axis(2,pos=poplabpos,at=i,
-                                labels=tidyNames(pop_vec[i],fula=T,khoesan=T),
+                                labels=tidyNames(pop_vec[i],fula=T,khoesan=T,tig=T),
                                 col.axis=y_ax_cols[i],las=2,tck=0,lwd=0,line=-0.5)
         
         for(i in seq(0.5,(n_pops+1),1)) abline(h=i,lty=3,lwd=0.5)
@@ -138,8 +138,8 @@ for(analy in c("HAPMAP","AfrMap","CeuMap"))
         
     
         onedate_mat <- twodate_mat <- matrix(NA,nr=length(pop_vec),nc=(length(ancreg_list)*2))
-        tpopcols <- c(grep("tpop1",colnames(tt),value=T)[2:9],
-                      grep("tpop2",colnames(tt),value=T)[2:9])
+        tpopcols <- c(grep("tpop1",colnames(malder),value=T)[2:9],
+                      grep("tpop2",colnames(malder),value=T)[2:9])
         colnames(onedate_mat) <- colnames(twodate_mat) <- tpopcols
         for(i in (1:length(pop_vec)))
         {

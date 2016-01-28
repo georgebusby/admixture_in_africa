@@ -29,9 +29,20 @@ points(xpnts,ypnts,bg=pop_pnts$col2plot,
        pch=as.numeric(pop_pnts$pch2plot),
        col=pop_pnts$rim2plot,
        cex=pt_cex,lwd=pt_lwd)
+if(revX == T)
+{
 text(x=max(xpnts),y=-(max(ypnts)-min(ypnts))/30,adj=1,cex=1,
      label=paste0("PC",xplot, " (", signif(eigvals[xplot]*100,3),"%)"))
+
+} else 
+{
+    text(x=min(xpnts),y=-(max(ypnts)-min(ypnts))/30,adj=0,cex=1,
+         label=paste0("PC",xplot, " (", signif(eigvals[xplot]*100,3),"%)"))
+}
+
+
 text(x=(max(xpnts)-min(xpnts))/30,y=min(ypnts),adj=0,srt=90,cex=1,
      label=paste0("PC",yplot, " (", signif(eigvals[yplot]*100,3),"%)"))
+    
 
 legend("bottomright",legend=panel_letter,cex=2,bty="n")
