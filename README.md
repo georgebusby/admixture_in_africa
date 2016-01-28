@@ -1,5 +1,8 @@
 # popgen
 
+
+![population structure in Africa][figures/MalariaGenMAPofPops.pdf]
+
 ## Summary
 I've put various pieces of code in this repository, mostly to do with work on admixture and natural selection with a pan-African dataset.
 
