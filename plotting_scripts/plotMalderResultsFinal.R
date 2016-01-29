@@ -27,7 +27,7 @@ poplist<- as.matrix(poplist)
 n_pops <- nrow(poplist)
 in_dir <- "/mnt/kwiat/data/bayes/users/george/popgen/analysis3/alder/output/"
 analys <- c("HAPMAP","CeuMap","AfrMap")
-malder_file <- "~/R/Copy/Rprojects/AfricaPOPGEN/manuscript/f3tables/AllPopsMalderFinalALL.txt"
+malder_file <- "~/R/Copy/Rprojects/AfricaPOPGEN/manuscript/f3tables/AllPopsMalderFinalALLmindis.txt"
 malder_plot <- read.table(malder_file,header=T, as.is=T)
 leginfo_file <- "data/MalariaGenAdmixturePopulationKey.txt"
 leginfo <- read.table(leginfo_file,header=T,comment.char="", as.is = T)
@@ -83,16 +83,16 @@ for(analy in c("HAPMAP","AfrMap","CeuMap"))
     
     ##################################################################
     ## PLOT DATES AND MAP COMPARISONS
-    pdf(paste0("figures/AllPopsMalderTimesMapComps",analy,".pdf"),height=9,width=9)
+    pdf(paste0("figures/AllPopsMalderTimesMapCompsMinDis",analy,".pdf"),height=9,width=9)
         layout(matrix(c(1,1,1,2,2,2,3,3,3,4,5,6),3,4),widths=c(4,1,1,3))
         par(mar=c(4,12,4,0.5))
         
-        #comp_ax <- c(0,400)
-        #x_labs3 <- c(2000,0,-2000,-5000,-10000)    
-        #x_labs3char <- c("2000\nCE",0,"2000\nBCE","5000\nBCE","10000\nBCE")
-        comp_ax <- c(0,240)
-        x_labs3 <- c(2000,0,-2000,-5000)
-        x_labs3char <- c("2000\nCE",0,"2000\nBCE","5000\nBCE")
+        comp_ax <- c(0,400)
+        x_labs3 <- c(2000,0,-2000,-5000,-10000)    
+        x_labs3char <- c("2000\nCE",0,"2000\nBCE","5000\nBCE","10000\nBCE")
+        #comp_ax <- c(0,240)
+        #x_labs3 <- c(2000,0,-2000,-5000)
+        #x_labs3char <- c("2000\nCE",0,"2000\nBCE","5000\nBCE")
     
         x_max <- min(x_labs3)
         plot(0,0,xlim=rev(range(x_labs3)),
@@ -112,16 +112,16 @@ for(analy in c("HAPMAP","AfrMap","CeuMap"))
         }
         
         ## SET THE SCENE
+        poplabpos <- 4800
+        ev1pos1 <- 4550
+        ev1pos2 <- 3900
+        ev2pos1 <- 3250
+        ev2pos2 <- 2600
 #         poplabpos <- 4600
-#         ev1pos1 <- 4400
-#         ev1pos2 <- 3800
+#         ev1pos1 <- 4100
+#         ev1pos2 <- 3600
 #         ev2pos1 <- 3100
 #         ev2pos2 <- 2600
-        poplabpos <- 4600
-        ev1pos1 <- 4100
-        ev1pos2 <- 3600
-        ev2pos1 <- 3100
-        ev2pos2 <- 2600
     
         
         for(i in 1:n_pops) axis(2,pos=poplabpos,at=i,

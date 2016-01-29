@@ -190,12 +190,10 @@ for(analy in c("HAPMAP","AfrMap","CeuMap"))
                          "East African Afroasiatic",
                          "KhoeSan",
                          "Eurasia",
-                         "main event ancestry",
-                         "high confidence date (P<0.001)",
-                         "low confidence date (P<0.05)")
-        l <- legend("top",legend=legend_text,pch=c(rep(15,8),22,21,21),
-                    col=c(pcolshex[c(1:3,6,4,5,7,8)],"black","black","black"),bty="n",
-                    pt.bg=c(pcolshex[c(1:3,6,4,5,7,8)],"white","black","grey"),
+                         "main event ancestry")
+        l <- legend("top",legend=legend_text,pch=c(rep(15,8),22),
+                    col=c(pcolshex[c(1:3,6,4,5,7,8)],"black"),bty="n",
+                    pt.bg=c(pcolshex[c(1:3,6,4,5,7,8)],"white"),
                     ncol=1,xpd=T,pt.cex=3,x.intersp=1,y.intersp=1.25,
                     pt.lwd=2,cex=1.25, title="Ancestry Region")
         par(mar=c(5,5,2,1))
