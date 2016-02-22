@@ -1,0 +1,17 @@
+{
+    "contents" : "#############################################################\n## PCA - need to run the actual pcas elsewhere, perhaps    ##\n##       using snpRelate package\n#############################################################\n## LOAD FILES\npca_table <- read.table(pca_file)\nleginfo <-read.table(leginfo_file,header=T,comment.char=\"\")\n\n###########################################################\n## GET EIGEN VECTORS AND EIGENVALS\neigvecs <- pca_table[,5:(ncol(pca_table)-1)]\neigvals <- pca_table[,ncol(pca_table)]\n\n## DEFINE PCH AND COLS\npop_vec <- as.character(pca_table[,2])\npop_pnts <- getPopSymbols(pop_vec,leginfo)\n\n## GET POINTS AND REVERSE AS NECESSARY\nxpnts <- eigvecs[,xplot]\nypnts <- eigvecs[,yplot]\n## REVERSE AXES IF NECESSARY\nif(revX==T) xpnts <- -(xpnts)\nif(revY==T) ypnts <- -(ypnts)\n\n## PLOT \nplot(xpnts,ypnts,main=\"\",xlab=\"\",ylab=\"\",axes=T,type=\"n\",xaxt=\"n\",yaxt=\"n\")\nabline(v=0,h=0)\npoints(xpnts,ypnts,bg=pop_pnts$col2plot,\n       pch=as.numeric(pop_pnts$pch2plot),\n       col=pop_pnts$rim2plot,\n       cex=pt_cex,lwd=pt_lwd)\nif(revX == T)\n{\ntext(x=max(xpnts),y=-(max(ypnts)-min(ypnts))/30,adj=1,cex=1,\n     label=paste0(\"PC\",xplot, \" (\", signif(eigvals[xplot]*100,3),\"%)\"))\n\n} else \n{\n    text(x=min(xpnts),y=-(max(ypnts)-min(ypnts))/30,adj=0,cex=1,\n         label=paste0(\"PC\",xplot, \" (\", signif(eigvals[xplot]*100,3),\"%)\"))\n}\n\n\ntext(x=(max(xpnts)-min(xpnts))/30,y=min(ypnts),adj=0,srt=90,cex=1,\n     label=paste0(\"PC\",yplot, \" (\", signif(eigvals[yplot]*100,3),\"%)\"))\n    \n\nlegend(\"bottomright\",legend=panel_letter,cex=2,bty=\"n\")",
+    "created" : 1453729597815.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "2581102326",
+    "id" : "6419D5CF",
+    "lastKnownWriteTime" : 1453729833,
+    "path" : "~/repos/popgen/plotting_scripts/africapca.R",
+    "project_path" : "plotting_scripts/africapca.R",
+    "properties" : {
+        "tempName" : "Untitled1"
+    },
+    "source_on_save" : false,
+    "type" : "r_source"
+}

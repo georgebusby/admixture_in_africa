@@ -1,0 +1,16 @@
+{
+    "contents" : "#' this is an internal function that converts a list of names\n#'\n#' This function converts lists of names for various plotting functions used in various plotting functions.\n#' @param x a list of names\n#' @param fula should FULAI and FULAII (and MANDINKAI) be kept as is? Defaults to FALSE\n#' @param pel Should PELII be kept as is? Defaults to FALSE\n#' @keywords Busby_bespoke\n#' @export\n#' @examples\n#' tidyNames(\"ESOMALI\", fula=T)\n\ntidyNames <- function(x,fula=F,pel=F,khoesan=F,tig=F){\n  x <- gsub(\"IBD\",\"\",x)\n  x <- gsub(\"CULTIVATOR\",\"\",x)\n  x <- gsub(\"BLACKSMITH\",\"\",x)\n  x <- gsub(\"ESOMALI\",\"SOMALI\",x)\n  x <- gsub(\"JUHOANSI\",\"JUHOAN\",x)\n  x <- gsub(\"JUHOAN\",\"JU/HOANSI\",x)\n  x <- gsub(\"XUNV\",\"XUN\",x)\n  x <- gsub(\"SEMI.BANTU\",\"SEMI-BANTU\",x) \n  x <- gsub(\"SWBANTU\",\"HERERO\",x)\n  x <- gsub(\"KHOMANI\",\"=KHOMANI\",x)\n  x <- gsub(\"GUIGHANAKGAL\",\"/GUI//GHANA_KGAL\",x)\n  x <- gsub(\"LWK\",\"LUHYA\",x)\n  x <- gsub(\"MKK\",\"MAASAI\",x)\n  x <- gsub(\"YRI\",\"YORUBA\",x)\n  if(pel==F)\n  {\n    x <- gsub(\"PELII\",\"PEL\",x)\n  }\n  if(fula==F)\n  {\n    x <- gsub(\"FULAII\",\"FULA\",x)\n    x <- gsub(\"FULAI\",\"FULA\",x)\n    x <- gsub(\"MANDINKAII\",\"MANDINKA\",x)\n    x <- gsub(\"MANDINKAI\",\"MANDINKA\",x)\n  }\n  \n  if(khoesan == T)\n  {\n      x <- gsub(\"/GUI//GHANA_KGAL\",\"/GUI//GANA\",x)\n      x <- gsub(\"JU/HOANSI\",\"JU/\\'HOANSI\",x)\n      x <- gsub(\"XUN\",\"!XUN\",x)\n      x <- gsub(\"==KHOMANI\",\"=KHOMANI\",x)\n  }\n  if(tig == T)\n  {\n     x <- gsub(\"TYGRAY\",\"TIGRAY\",x)\n  }\n  \n  return(x)\n}\n\n# tidyNamesUnique <- function(x){\n#   x <- unique(gsub(\"IBD\",\"\",x))\n#   x <- unique(gsub(\"CULTIVATOR\",\"\",x))\n#   x <- unique(gsub(\"BLACKSMITH\",\"\",x))\n#   x <- unique(gsub(\"ESOMALI\",\"SOMALI\",x))\n#   x <- unique(gsub(\"JUHOANSI\",\"JUHOAN\",x))\n#   x <- unique(gsub(\"JUHOAN\",\"JUHOANSI\",x))\n#   x <- unique(gsub(\"XUNV\",\"XUN\",x))\n#   x <- unique(gsub(\"SWBANTU\",\"HERERO\",x))\n#   x <- unique(gsub(\"KHOMANI\",\"=KHOMANI\",x))\n#   x <- unique(gsub(\"GUIGHANAKGAL\",\"/GUI//GHANA_KGAL\",x))\n#   x <- unique(gsub(\"JUHOANSI\",\"JU/HOANSI\",x))\n#   x <- unique(gsub(\"LWK\",\"LUHYA\",x))\n#   x <- unique(gsub(\"MKK\",\"MAASAI\",x))\n#   x <- unique(gsub(\"YRI\",\"YORUBA\",x))\n#   \n#   return(x)\n# }",
+    "created" : 1453724093478.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "2667818737",
+    "id" : "9E9FD115",
+    "lastKnownWriteTime" : 1453724138,
+    "path" : "~/repos/popgen/packages_dev/copyselection/R/tidyNames.R",
+    "project_path" : "packages_dev/copyselection/R/tidyNames.R",
+    "properties" : {
+    },
+    "source_on_save" : false,
+    "type" : "r_source"
+}

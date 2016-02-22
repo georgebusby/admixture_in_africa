@@ -1,0 +1,17 @@
+{
+    "contents" : "\nsetwd(\"~/Data/Stauback2012_mouseSNPs/mouse_maps/\")\n\nsystem(\"for i in $(seq 1 19); do grep -w ^chr${i}  mouse_map_Brunschwig2012.txt | awk '{print $2*1000,$3/1000}' > genetic_map_chr${i}.txt; done\")\n\nfor(chrom in 1:19)\n{\n    x <- read.table(paste0(\"genetic_map_chr\",chrom,\".txt\"),header=F,as.is=T)\n    ## check base pairs are ascending\n    x <- x[order(x[,1]),]\n    test <- diff(x[,1])==0\n    while(sum(test)>0)\n    {\n        rowns <- (1:nrow(x))[test]\n        x[rowns+1,1] <- x[rowns+1,1]+1\n        test <- diff(x[,1])==0\n    }\n    genpos <- 0\n    for(i in 2:nrow(x))\n    {\n        nbases <- x[i,1]-x[(i-1),1]\n        recrate <- x[(i-1),2]/10\n        mappos <- nbases*recrate\n        genpos <- c(genpos,genpos[length(genpos)]+mappos)\n    }\n    \n    x <- cbind(x,genpos)\n    colnames(x) <- c(\"bppos\",\"rrate\",\"genpos\")\n    ## make sure no pesky scientific notation in output\n    x$bppos <- format(x$bppos,scientific=F)\n    x$rrate <- format(x$rrate,scientific=F)\n    write.table(x,file=paste0(\"genetic_map_chr\",chrom,\".txt\"),col.names=T,row.names=F,quote=F)\n}\n\n\n## now make CP recrate files\n\nfor(chrom in 1:19)\n{\n    snps <- read.table(paste0(\"../plink_files/Staubach2012genotypesChrom\",chrom,\"withCMs.bim\"), as.is=T)\n    snpsbp <- diff(snps[,4])\n    recdiff <- diff(snps[,3])*100\n    \n    cprecs <- cbind(snps[,4],c(0,recdiff/snpsbp))\n    colnames(cprecs) <- c(\"position\",\"recrate.perbp\")\n    cprecs[,2] <- format(cprecs[,2],scientific=F)\n    \n    write.table(cprecs,file=paste0(\"../plink_files/Staubach2012genotypesChrom\",chrom,\"phased.recrates\"),\n                col.names=T,row.names=F,quote=F)\n}",
+    "created" : 1455112645311.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "1408265074",
+    "id" : "1266FEF7",
+    "lastKnownWriteTime" : 1455123980,
+    "path" : "~/Data/Stauback2012_mouseSNPs/mouse_maps/makeMouseGeneticMaps.R",
+    "project_path" : null,
+    "properties" : {
+        "tempName" : "Untitled1"
+    },
+    "source_on_save" : false,
+    "type" : "r_source"
+}
