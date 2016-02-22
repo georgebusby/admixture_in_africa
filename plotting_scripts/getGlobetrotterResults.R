@@ -399,6 +399,7 @@ res.tabA$FinalAnaly[res.tabA$Cluster%in%pops] <- "main.null"
 ## FOR GAMBIA/MALI : FORCE TWO DATE, BUT ONLY REPORT SECOND DATE
 pops <- popkey$Ethnic_Group[popkey$RegionM=="Western_Africa_Niger-Congo"]
 res.tabA$FinalResult[res.tabA$Cluster%in%pops] <- "1D"
+
 ## SWAP SECOND DATE COLUMNS FOR FIRST DATE
 temp <- res.tabA[res.tabA$Cluster%in%pops,]
 date1cols <- c("Date","alpha","best.source1","best.source2","dateH","dateL","Date.CI")

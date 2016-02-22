@@ -42,7 +42,8 @@ popplot <- factor(popplot,levels=popplotorder)
 
 ## PULL IN DATA
 admixturesources2 <- read.table("data/MalariaGenGlobetrotterAdmixtureSources3.txt",header=T,row.names=1,as.is=T)
-final.res2plot <- read.table("data/MalariaGenGlobetrotter2plot.txt",header=T,row.names=1,as.is=T)
+#final.res2plot2 <- read.table("data/MalariaGenGlobetrotter2plot.txt",header=T,row.names=1,as.is=T)
+final.res2plot <- read.table("data/MalariaGenGlobetrotter2plotFinal.txt",header=T,row.names=1,as.is=T)
 admixturesources2 <- admixturesources2[,levels(popplot)]
 dateboots <- read.table("data/MalariaGenGlobetrotterOneDateBootstraps.txt",header=T,row.names=1,as.is=T)
 date2boots <- read.table("data/MalariaGenGlobetrotterTwoDateBootstraps.txt",header=T,row.names=1,as.is=T)
@@ -82,7 +83,51 @@ all_src_mat <- tempresults[[3]]
 dboots <- tempresults[[4]]
 allsources <- tempresults[[5]]
 
-################################
+
+###########################################################
+## NEED TO MAKE SURE THAT WE'RE USING THE SAME DATE BOOTS AS
+## THOSE REPORTED IN FIGURE 4
+
+dboots2get <- final.res2plot[,c(1,2,4)]
+dboots2get$boots <- "dateboots"
+dboots2get$boots[dboots2get$Result=="2D"] <- "date2boots"
+dboots2get$pick <- 1
+dboots2get$pick[dboots2get$Result=="2D"] <- "both"
+test <- dboots2get$Cluster%in%popkey$Ethnic_Group[popkey$RegionM=="Western_Africa_Niger-Congo"]
+dboots2get$boots[test] <- "date2boots"
+dboots2get$pick[test] <- "2"
+
+## NOW UPDATE dboots
+for(i in 1:nrow(dboots2get))
+{
+    run <- dboots2get$Analysis[i]
+    tmp <- get(dboots2get$boots[i])
+    tmp <- tmp[tmp$pop==dboots2get$Cluster[i]&tmp$X.main.==run,]
+    if(dboots2get$boots[i] == "dateboots")
+    {
+        bts <- tmp$date1.est.boot
+        if(length(bts) < 100) bts <- c(bts,rep(mean(bts),100-length(bts)))
+            
+    } else if(dboots2get$boots[i] == "date2boots" & dboots2get$pick[i] == 2)
+    {
+        bts <- tmp$date2.est.boot
+        if(length(bts) < 100) bts <- c(bts,rep(mean(bts),100-length(bts)))
+    } else
+    {
+        bts <- tmp$date1.est.boot
+        if(length(bts) < 100) bts <- c(bts,rep(mean(bts),100-length(bts)))
+        bts2 <- tmp$date2.est.boot
+        if(length(bts2) < 100) bts2 <- c(bts2,rep(mean(bts2),100-length(bts2)))
+        bts <- rbind(bts,bts2)
+    }
+    dboots[dboots[,1]==dboots2get$Cluster[i],6:ncol(dboots)] <- bts
+}
+
+
+
+
+
+###########################################################
 ## PLOT DATE DENSITIES
 ## RESHAPE DATEBOOTS FOR GGPLOT
 dboots2 <- c()
@@ -260,7 +305,7 @@ for(i in 2:nrow(new_regstab))
     dbootsMin$don1.component.reg <- gsub(new_regstab[i,1],new_regstab[i,2],dbootsMin$don1.component.reg)
 }
 
-dbootsMin$don1.component.reg <- factor(dbootsMin$don1.component.reg,levels=new_regs[c(1:3,5,4)])
+dbootsMin$don1.component.reg <- factor(dbootsMin$don1.component.reg,levels=new_regs[c(1,4,3,5,2)])
 
 ## NOW FOR MAJOR SOURCES
 dbootsMaj$don1.component.reg <- sapply(dbootsMaj$don1.component.reg,as.character)
@@ -273,7 +318,7 @@ for(i in 2:nrow(new_regstab))
 {
     dbootsMaj$don1.component.reg <- gsub(new_regstab[i,1],new_regstab[i,2],dbootsMaj$don1.component.reg)
 }
-dbootsMaj$don1.component.reg <- factor(dbootsMaj$don1.component.reg,levels=new_regs[c(1:3,5,4)])    
+dbootsMaj$don1.component.reg <- factor(dbootsMaj$don1.component.reg,levels=new_regs[c(1,4,3,5,2)])    
 
 
 p7 <- ggplot(dbootsMin, aes(x=dates)) +
