@@ -12,9 +12,6 @@ I've put various pieces of code in this repository, mostly to do with work on ad
 ### data/
 various files containing the baseline data used for plotting
 
-### data_scripts/
-scripts for changing data formats
-
 ### figures/
 contains figures generated from plotting_scripts
 
