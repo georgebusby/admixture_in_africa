@@ -1,12 +1,12 @@
 # Admixture into and within Sub-Saharan Africa
 
 
-![African populations](figures/MalariaGenMAPofPops.png)
+<img src="figures/MalariaGenMAPofPops.png" width="500" title="African populations used in study">
 
 ## Summary
 This code relates to analyses and figures generated for our paper, _Admixture into and within sub-Saharan Africa_ published in eLife, which can be downloaded [here](http://dx.doi.org/10.7554/eLife.15266 "Admixture into and within sub-Saharan Africa")
 
-I've put various pieces of code in this repository, mostly to do with work on admixture and natural selection with a pan-African dataset. It is highly likely that there are some bugs in this code, so let me know if you're interested in using the code and you run into problems
+I've put various pieces of code in this repository, mostly to do with work on admixture in the pan-African dataset used in the paper above. I haven't provided much help on usage, I'm afraid, although the plotting code is reasonably straightforward. It is highly likely that there are bugs, so let me know if you're interested in using anything and you run into problems
 
 
 ## Overview of file system
